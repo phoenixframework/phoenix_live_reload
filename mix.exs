@@ -30,8 +30,9 @@ defmodule PhoenixLiveReload.Mixfile do
   end
 
   defp deps do
-    # TODO: bump to phoenix 0.11
+    # TODO bump to phoenix 0.11
     [{:phoenix, github: "phoenixframework/phoenix"},
+     # TODO use hex version
      {:fs, github: "synrc/fs"}]
   end
 end
