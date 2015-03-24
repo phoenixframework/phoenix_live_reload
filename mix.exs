@@ -1,7 +1,7 @@
 defmodule PhoenixLiveReload.Mixfile do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [app: :phoenix_live_reload,
@@ -10,7 +10,7 @@ defmodule PhoenixLiveReload.Mixfile do
      deps: deps,
 
      # Hex
-     description: "Provides live-reload functionality for Phoenix in dev",
+     description: "Provides live-reload functionality for Phoenix",
      package: package,
 
      # Docs
@@ -30,9 +30,7 @@ defmodule PhoenixLiveReload.Mixfile do
   end
 
   defp deps do
-    # TODO bump to phoenix 0.11
-    [{:phoenix, github: "phoenixframework/phoenix"},
-     # TODO use hex version
-     {:fs, github: "synrc/fs"}]
+    [{:phoenix, "~> 0.11-dev"},
+     {:fs, "~> 0.9"}]
   end
 end
