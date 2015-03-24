@@ -60,7 +60,7 @@ defmodule Phoenix.LiveReloader do
   end
 
   socket "/phoenix" do
-    channel "phoenix", Phoenix.Channel.ControlChannel
+    channel "phoenix", PhoenixLiveReload.Channel
   end
 
   get "/phoenix/live-reloader", Phoenix.Router.LiveReload.Controller, :show

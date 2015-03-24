@@ -1,4 +1,4 @@
 %{"fs": {:git, "git://github.com/synrc/fs.git", "1c9587c6c2651f2ac70f26e6cb8220e7b81a9d69", []},
-  "phoenix": {:git, "git://github.com/phoenixframework/phoenix.git", "61f89b451b1d8b6903c56980bb96b52a2a4d94d4", []},
+  "phoenix": {:git, "git://github.com/phoenixframework/phoenix.git", "d25e9ade123ea3eb48b894d135cd27643de86fdd", [branch: "cm-fs"]},
   "plug": {:hex, :plug, "0.11.1"},
   "poison": {:hex, :poison, "1.3.1"}}
