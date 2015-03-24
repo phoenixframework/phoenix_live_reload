@@ -5,6 +5,7 @@ defmodule Phoenix.LiveReloader do
   Router for live-reload detection in development.
 
   ## Usage
+
   Add the `Phoenix.LiveReloader` plug within a `code_reloading?` block
   in your Endpoint, ie:
 
@@ -13,8 +14,8 @@ defmodule Phoenix.LiveReloader do
         plug Phoenix.LiveReloader
       end
 
-
   ## Configuration
+
   For live-reloading in development, add the following `:live_reload`
   configuration to your Endpoint with a list of patterns to watch for changes:
 
@@ -45,11 +46,12 @@ defmodule Phoenix.LiveReloader do
 
   """
 
-  def call(%Plug.Conn{path_info: ["phoenix" | _rest]} = conn, opts) do
+  def call(%Plug.Conn{path_info: ["phoenix", "live_reload" | _]} = conn, opts) do
     conn
     |> super(opts)
     |> halt
   end
+
   def call(conn, _opts) do
     patterns = get_in conn.private.phoenix_endpoint.config(:live_reload), [:patterns]
     if patterns && patterns != [] do
@@ -59,11 +61,11 @@ defmodule Phoenix.LiveReloader do
     end
   end
 
-  socket "/phoenix" do
-    channel "phoenix", PhoenixLiveReload.Channel
+  socket "/phoenix/live_reload/listen" do
+    channel "phoenix:live_reload", Phoenix.LiveReload.Channel
   end
 
-  get "/phoenix/live-reloader", Phoenix.Router.LiveReload.Controller, :show
+  get "/phoenix/live_reload/frame", Phoenix.LiveReload.Frame, :frame
 
   defp before_send_inject_reloader(conn) do
     register_before_send conn, fn conn ->
@@ -82,36 +84,8 @@ defmodule Phoenix.LiveReloader do
 
   defp reload_assets_tag() do
     """
-    <iframe src="/phoenix/live-reloader" width="0" height="0" scrolling="no" frameborder="0"></iframe>
+    <iframe src="/phoenix/live_reload/frame" width="0" height="0" scrolling="no" frameborder="0"></iframe>
     """
   end
 end
 
-defmodule Phoenix.Router.LiveReload.Controller do
-  use Phoenix.Controller
-
-  @external_resource phx_js_path = "../phoenix/priv/static/phoenix.js"
-  @phoenix_js File.read!(phx_js_path)
-
-  def call(conn, _) do
-    config = conn.private.phoenix_endpoint.config(:live_reload)
-    url = Path.join(config[:url] || "/", "phoenix")
-
-    html conn, """
-      <html><body>
-      <script>
-        #{@phoenix_js}
-        var phx = require("phoenix")
-        var socket = new phx.Socket("#{url}")
-        socket.connect()
-        socket.join("phoenix", {}, function(chan){
-          chan.on("assets:change", function(msg){
-            chan.off("assets:change")
-            window.top.location.reload()
-          })
-        })
-      </script>
-      </body></html>
-    """
-  end
-end
