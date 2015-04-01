@@ -20,12 +20,13 @@ defmodule Phoenix.LiveReload.Frame do
         var phx = require("phoenix")
         var socket = new phx.Socket("#{url}")
         socket.connect()
-        socket.join("phoenix:live_reload", {}, function(chan){
-          chan.on("assets:change", function(msg){
-            chan.off("assets:change")
-            window.top.location.reload()
+        socket.join("phoenix:live_reload", {})
+          .receive("ok", function(chan){
+            chan.on("assets_change", function(msg){
+              chan.off("assets_change")
+              window.top.location.reload()
+            })
           })
-        })
       </script>
       </body></html>
     """)
