@@ -31,7 +31,7 @@ defmodule PhoenixLiveReload.Mixfile do
 
   defp deps do
     # TODO bump to phoenix 0.11.0
-    [{:phoenix, github: "phoenixframework/phoenix", branch: "cm-sync-channels"},
+    [{:phoenix, github: "phoenixframework/phoenix"},
      {:fs, "~> 0.9.1"}]
   end
 end

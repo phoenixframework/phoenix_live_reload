@@ -1,4 +1,4 @@
 %{"fs": {:hex, :fs, "0.9.1"},
-  "phoenix": {:git, "git://github.com/phoenixframework/phoenix.git", "9aa58f7b89417483022bf2aa980897dd7d81bdd4", [branch: "cm-sync-channels"]},
+  "phoenix": {:git, "git://github.com/phoenixframework/phoenix.git", "a7904bc6fd9515c945aec19909888478a1636c10", []},
   "plug": {:hex, :plug, "0.11.1"},
   "poison": {:hex, :poison, "1.3.1"}}
