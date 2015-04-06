@@ -1,7 +1,7 @@
 defmodule PhoenixLiveReload.Mixfile do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.3.0"
 
   def project do
     [app: :phoenix_live_reload,
@@ -30,8 +30,7 @@ defmodule PhoenixLiveReload.Mixfile do
   end
 
   defp deps do
-    # TODO bump to phoenix 0.11.0
-    [{:phoenix, github: "phoenixframework/phoenix"},
+    [{:phoenix, "~> 0.11.0"},
      {:fs, "~> 0.9.1"}]
   end
 end
