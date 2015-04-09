@@ -84,7 +84,7 @@ defmodule Phoenix.LiveReloader do
 
   defp reload_assets_tag() do
     """
-    <iframe src="/phoenix/live_reload/frame" width="0" height="0" scrolling="no" frameborder="0"></iframe>
+    <iframe src="/phoenix/live_reload/frame" style="display: none;"></iframe>
     """
   end
 end
