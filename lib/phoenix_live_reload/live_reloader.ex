@@ -69,8 +69,10 @@ defmodule Phoenix.LiveReloader do
 
   defp before_send_inject_reloader(conn) do
     register_before_send conn, fn conn ->
-      if conn |> get_resp_header("content-type") |> html_content_type? do
-        [page | rest] = String.split(to_string(conn.resp_body), "</body>")
+      resp_body = to_string(conn.resp_body)
+
+      if inject?(conn, resp_body) do
+        [page | rest] = String.split(resp_body, "</body>")
         body = page <> reload_assets_tag() <> Enum.join(["</body>" | rest], "")
 
         put_in conn.resp_body, body
@@ -78,6 +80,13 @@ defmodule Phoenix.LiveReloader do
         conn
       end
     end
+  end
+
+  defp inject?(conn, resp_body) do
+    conn
+    |> get_resp_header("content-type")
+    |> html_content_type?
+    |> Kernel.&&(String.contains?(resp_body, "<body"))
   end
   defp html_content_type?([]), do: false
   defp html_content_type?([type | _]), do: String.starts_with?(type, "text/html")
@@ -88,4 +97,3 @@ defmodule Phoenix.LiveReloader do
     """
   end
 end
-
