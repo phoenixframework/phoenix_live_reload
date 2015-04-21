@@ -17,16 +17,11 @@ defmodule Phoenix.LiveReload.Frame do
       <html><body>
       <script>
         #{phoenix_js()}
+
         var phx = require("phoenix")
         var socket = new phx.Socket("#{url}")
-        socket.connect()
-        socket.join("phoenix:live_reload", {})
-          .receive("ok", function(chan){
-            chan.on("assets_change", function(msg){
-              chan.off("assets_change")
-              window.top.location.reload()
-            })
-          })
+
+        #{phoenix_live_reload_js()}
       </script>
       </body></html>
     """)
@@ -34,5 +29,9 @@ defmodule Phoenix.LiveReload.Frame do
 
   defp phoenix_js() do
     File.read! Application.app_dir(:phoenix, "priv/static/phoenix.js")
+  end
+
+  defp phoenix_live_reload_js do
+    File.read! Application.app_dir(:phoenix_live_reload, "priv/static/phoenix_live_reload.js")
   end
 end

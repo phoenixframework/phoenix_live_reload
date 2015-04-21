@@ -15,7 +15,9 @@ defmodule Phoenix.LiveReload.Channel do
 
   def handle_info({_pid, {:fs, :file_event}, {path, _event}}, socket) do
     if matches_any_pattern?(path, socket.assigns[:patterns]) do
-      push socket, "assets_change", %{}
+      asset_type = Path.extname(path) |> String.lstrip(?.)
+
+      push socket, "assets_change", %{asset_type: asset_type}
     end
 
     {:noreply, socket}
