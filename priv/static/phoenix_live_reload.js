@@ -4,7 +4,7 @@ var buildFreshUrl = function(url) {
   return url + (url.indexOf('?') >= 0 ? '&' : '?') +'reload=' + date;
 };
 
-var refresh = function() {
+var repaint = function() {
   var browser = navigator.userAgent.toLowerCase();
 
   if(browser.indexOf('chrome') > -1) setTimeout( function() { document.body.offsetHeight; }, 25);
@@ -16,7 +16,7 @@ var cssStrategy = function() {
   .filter(function(link) { return link.href })
   .forEach(function(link) { link.href = buildFreshUrl(link.href) });
 
-  refresh();
+  repaint();
 };
 
 var defaultStrategy = function(chan) {
