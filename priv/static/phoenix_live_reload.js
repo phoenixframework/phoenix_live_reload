@@ -1,7 +1,7 @@
 var buildFreshUrl = function(url) {
   var date = Math.round(Date.now() / 1000).toString();
   url = url.replace(/(\&|\\?)reload=\d*/, '');
-return url + (url.indexOf('?') >= 0 ? '&' : '?') +'reload=' + date;
+  return url + (url.indexOf('?') >= 0 ? '&' : '?') +'reload=' + date;
 };
 
 var refresh = function() {
@@ -13,8 +13,8 @@ var refresh = function() {
 var cssStrategy = function() {
   [].slice
   .call(window.top.document.querySelectorAll('link[rel=stylesheet]'))
-  .filter( function(link) { return link.href})
-  .forEach( function(link) { link.href = buildFreshUrl(link.href) });
+  .filter(function(link) { return link.href })
+  .forEach(function(link) { link.href = buildFreshUrl(link.href) });
 
   refresh();
 };
