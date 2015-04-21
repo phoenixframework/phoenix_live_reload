@@ -1,7 +1,7 @@
 var buildFreshUrl = function(url) {
   var date = Math.round(Date.now() / 1000).toString();
-  url = url.replace(/(\&|\\?)reload=\d*/, '');
-  return url + (url.indexOf('?') >= 0 ? '&' : '?') +'reload=' + date;
+  url = url.replace(/(\&|\\?)vsn=\d*/, '');
+  return url + (url.indexOf('?') >= 0 ? '&' : '?') +'vsn=' + date;
 };
 
 var repaint = function() {
