@@ -2,6 +2,8 @@ defmodule Phoenix.LiveReload.Frame do
   import Plug.Conn
 
   @behaviour Plug
+  @phoenix_js File.read!(Application.app_dir(:phoenix, "priv/static/phoenix.js"))
+  @phoenix_live_reload_js File.read!(Application.app_dir(:phoenix_live_reload, "priv/static/phoenix_live_reload.js"))
 
   def init(opts) do
     opts
@@ -16,23 +18,14 @@ defmodule Phoenix.LiveReload.Frame do
     |> send_resp(200, """
       <html><body>
       <script>
-        #{phoenix_js()}
+        #{@phoenix_js}
+
         var phx = require("phoenix")
         var socket = new phx.Socket("#{url}")
-        socket.connect()
-        socket.join("phoenix:live_reload", {})
-          .receive("ok", function(chan){
-            chan.on("assets_change", function(msg){
-              chan.off("assets_change")
-              window.top.location.reload()
-            })
-          })
+
+        #{@phoenix_live_reload_js}
       </script>
       </body></html>
     """)
-  end
-
-  defp phoenix_js() do
-    File.read! Application.app_dir(:phoenix, "priv/static/phoenix.js")
   end
 end
