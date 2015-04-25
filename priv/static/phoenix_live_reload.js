@@ -12,9 +12,9 @@ var repaint = function() {
 
 var cssStrategy = function() {
   [].slice
-  .call(window.top.document.querySelectorAll('link[rel=stylesheet]'))
-  .filter(function(link) { return link.href })
-  .forEach(function(link) { link.href = buildFreshUrl(link.href) });
+    .call(window.top.document.querySelectorAll('link[rel=stylesheet]'))
+    .filter(function(link) { return link.href })
+    .forEach(function(link) { link.href = buildFreshUrl(link.href) });
 
   repaint();
 };
@@ -30,8 +30,7 @@ var reloadStrategies = {
 };
 
 socket.connect();
-socket.join("phoenix:live_reload", {})
-.receive("ok", function(chan) {
+socket.join("phoenix:live_reload", {}).receive("ok", function(chan) {
   chan.on("assets_change", function(msg) {
     var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.default;
     reloadStrategy(chan);
