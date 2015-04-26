@@ -23,7 +23,11 @@ defmodule Phoenix.LiveReload.Channel do
     {:noreply, socket}
   end
 
-  defp matches_any_pattern?(path, patterns) do
-    Enum.any?(patterns, fn pattern -> String.match?(to_string(path), pattern) end)
+  def matches_any_pattern?(path, patterns) do
+    path = to_string(path)
+
+    Enum.any?(patterns, fn pattern ->
+      String.match?(path, pattern) and !String.match?(path, ~r/_build/)
+    end)
   end
 end

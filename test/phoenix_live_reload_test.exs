@@ -53,4 +53,5 @@ defmodule PhoenixLiveReloadTest do
     refute to_string(conn.resp_body) =~
            ~s(<iframe src="/phoenix/live_reload/frame")
   end
+
 end
