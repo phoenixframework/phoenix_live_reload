@@ -30,9 +30,9 @@ var reloadStrategies = {
 };
 
 socket.connect();
-socket.join("phoenix:live_reload", {}).receive("ok", function(chan) {
-  chan.on("assets_change", function(msg) {
-    var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.default;
-    reloadStrategy(chan);
-  });
+var chan = socket.chan("phoenix:live_reload", {})
+chan.on("assets_change", function(msg) {
+  var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.default;
+  reloadStrategy(chan);
 });
+chan.join();
