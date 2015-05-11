@@ -30,7 +30,7 @@ defmodule PhoenixLiveReload.Mixfile do
   end
 
   defp deps do
-    [{:phoenix, "~> 0.12.0"},
+    [{:phoenix, "~> 0.13.0"},
      {:fs, "~> 0.9.1"}]
   end
 end
