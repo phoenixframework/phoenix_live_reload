@@ -18,6 +18,14 @@ This project uses [`fs`](https://github.com/synrc/fs) as a dependency to watch y
 * Windows via [inotify-win](https://github.com/thekid/inotify-win) (no installation required)
 * Mac OS X via fsevents (no installation required)
 
+
+## Skipping remote CSS reload
+
+All tylesheets are reloaded without a page refresh anytime a style is detected as having changed. In certain cases such as serving stylesheets from a remote host, you may wish to prevent unnecessary reload of these stylesheets during development. For this, you can include a `data-no-reload` attribute on the link tag, ie:
+
+    <link rel="stylesheet" href="http://example.com/style.css" data-no-reload>
+
+
 ## License
 
 Same license as Phoenix.

@@ -1,35 +1,38 @@
-var buildFreshUrl = function(link) {
-  var date = Math.round(Date.now() / 1000).toString();
-  var url = link.href.replace(/(\&|\\?)vsn=\d*/, '');
+var buildFreshUrl = function(link){
+  var date    = Math.round(Date.now() / 1000).toString();
+  var url     = link.href.replace(/(\&|\\?)vsn=\d*/, '');
+  var newLink = document.createElement('link');
 
-  l = document.createElement('link');
-  l.setAttribute('rel', 'stylesheet');
-  l.setAttribute('type', 'text/css');
-  l.setAttribute('href', url + (url.indexOf('?') >= 0 ? '&' : '?') +'vsn=' + date);
-  top.document.head.appendChild(l);
+  newLink.setAttribute('rel', 'stylesheet');
+  newLink.setAttribute('type', 'text/css');
+  newLink.setAttribute('href', url + (url.indexOf('?') >= 0 ? '&' : '?') +'vsn=' + date);
+  window.top.document.head.appendChild(newLink);
+  newLink.onload = function(){ link.remove() }
 
-  l.onload = function(){
-    link.remove();
-  };
-
-  return l;
+  return newLink;
 };
 
-var repaint = function() {
+var repaint = function(){
   var browser = navigator.userAgent.toLowerCase();
-  if(browser.indexOf('chrome') > -1) setTimeout( function() { document.body.offsetHeight; }, 25);
+  if(browser.indexOf('chrome') > -1){
+    setTimeout(function(){ document.body.offsetHeight; }, 25);
+  }
 };
 
-var cssStrategy = function() {
+var cssStrategy = function(){
+  var reloadableLinkElements = window.top.document.querySelectorAll(
+    'link[rel=stylesheet]:not([data-no-reload])'
+  );
+
   [].slice
-    .call(window.top.document.querySelectorAll('link[rel=stylesheet]:not([data-no-reload])'))
+    .call(reloadableLinkElements)
     .filter(function(link) { return link.href })
     .forEach(function(link) { buildFreshUrl(link) });
 
   repaint();
 };
 
-var defaultStrategy = function(chan) {
+var defaultStrategy = function(chan){
   chan.off('assets_change');
   window.top.location.reload();
 };
