@@ -1,26 +1,39 @@
-var buildFreshUrl = function(url) {
-  var date = Math.round(Date.now() / 1000).toString();
-  url = url.replace(/(\&|\\?)vsn=\d*/, '');
-  return url + (url.indexOf('?') >= 0 ? '&' : '?') +'vsn=' + date;
+var buildFreshUrl = function(link){
+  var date    = Math.round(Date.now() / 1000).toString();
+  var url     = link.href.replace(/(\&|\\?)vsn=\d*/, '');
+  var newLink = document.createElement('link');
+
+  newLink.setAttribute('rel', 'stylesheet');
+  newLink.setAttribute('type', 'text/css');
+  newLink.setAttribute('href', url + (url.indexOf('?') >= 0 ? '&' : '?') +'vsn=' + date);
+  window.top.document.head.appendChild(newLink);
+  newLink.onload = function(){ link.remove() }
+
+  return newLink;
 };
 
-var repaint = function() {
+var repaint = function(){
   var browser = navigator.userAgent.toLowerCase();
-
-  if(browser.indexOf('chrome') > -1) setTimeout( function() { document.body.offsetHeight; }, 25);
+  if(browser.indexOf('chrome') > -1){
+    setTimeout(function(){ document.body.offsetHeight; }, 25);
+  }
 };
 
-var cssStrategy = function() {
+var cssStrategy = function(){
+  var reloadableLinkElements = window.top.document.querySelectorAll(
+    'link[rel=stylesheet]:not([data-no-reload])'
+  );
+
   [].slice
-    .call(window.top.document.querySelectorAll('link[rel=stylesheet]'))
+    .call(reloadableLinkElements)
     .filter(function(link) { return link.href })
-    .forEach(function(link) { link.href = buildFreshUrl(link.href) });
+    .forEach(function(link) { buildFreshUrl(link) });
 
   repaint();
 };
 
-var defaultStrategy = function(chan) {
-  chan.off("assets_change");
+var defaultStrategy = function(chan){
+  chan.off('assets_change');
   window.top.location.reload();
 };
 
@@ -30,8 +43,8 @@ var reloadStrategies = {
 };
 
 socket.connect();
-var chan = socket.chan("phoenix:live_reload", {})
-chan.on("assets_change", function(msg) {
+var chan = socket.chan('phoenix:live_reload', {})
+chan.on('assets_change', function(msg) {
   var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.default;
   reloadStrategy(chan);
 });

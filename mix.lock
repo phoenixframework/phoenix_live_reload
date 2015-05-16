@@ -1,4 +1,4 @@
 %{"fs": {:hex, :fs, "0.9.1"},
-  "phoenix": {:hex, :phoenix, "0.12.0"},
-  "plug": {:hex, :plug, "0.12.1"},
+  "phoenix": {:hex, :phoenix, "0.13.0"},
+  "plug": {:hex, :plug, "0.12.2"},
   "poison": {:hex, :poison, "1.4.0"}}
