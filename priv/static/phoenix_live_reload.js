@@ -6,7 +6,8 @@ var buildFreshUrl = function(link){
   newLink.setAttribute('rel', 'stylesheet');
   newLink.setAttribute('type', 'text/css');
   newLink.setAttribute('href', url + (url.indexOf('?') >= 0 ? '&' : '?') +'vsn=' + date);
-  window.top.document.head.appendChild(newLink);
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+
   newLink.onload = function(){ link.remove() }
 
   return newLink;
