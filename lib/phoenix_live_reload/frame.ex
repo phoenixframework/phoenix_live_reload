@@ -2,9 +2,9 @@ defmodule Phoenix.LiveReload.Frame do
   import Plug.Conn
 
   @behaviour Plug
-  @external_resource phoenix_path = "priv/static/phoenix.js"
+  @external_resource phoenix_path = Application.app_dir(:phoenix, "priv/static/phoenix.js")
   @external_resource reload_path = "priv/static/phoenix_live_reload.js"
-  @phoenix_js File.read!(Application.app_dir(:phoenix, phoenix_path))
+  @phoenix_js File.read!(phoenix_path)
   @phoenix_live_reload_js File.read!(Application.app_dir(:phoenix_live_reload, reload_path))
 
   def init(opts) do
