@@ -35,13 +35,13 @@ defmodule PhoenixLiveReloadTest do
       "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" style=\"display: none;\"></iframe>\n</body></html>"
   end
 
-  test "skips live_reload injection if html response missing body tag" do
+  test "Added warning console message if html response missing body tag" do
     opts = Phoenix.LiveReloader.init([])
     conn = conn("/")
            |> put_resp_content_type("text/html")
            |> Phoenix.LiveReloader.call(opts)
            |> send_resp(200, "<h1>Phoenix</h1>")
-    assert to_string(conn.resp_body) == "<h1>Phoenix</h1>"
+    assert to_string(conn.resp_body) == "<h1>Phoenix</h1><script> console.warn('Phoenix live reload is enabled but the <body> tag missing'); </script>\n"
   end
 
   test "skips live_reload if not html request" do
@@ -52,6 +52,20 @@ defmodule PhoenixLiveReloadTest do
            |> send_resp(200, "")
     refute to_string(conn.resp_body) =~
            ~s(<iframe src="/phoenix/live_reload/frame")
+    refute to_string(conn.resp_body) =~
+           ~s(console.warn)
   end
 
+  test "skips live_reload if AJAX request" do
+    opts = Phoenix.LiveReloader.init([])
+    conn = conn("/")
+           |> put_resp_content_type("text/html")
+           |> put_req_header("x-requested-with", "XMLHttpRequest")
+           |> Phoenix.LiveReloader.call(opts)
+           |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
+    refute to_string(conn.resp_body) =~
+           ~s(<iframe src="/phoenix/live_reload/frame")
+    refute to_string(conn.resp_body) =~
+           ~s(console.warn)
+  end
 end
