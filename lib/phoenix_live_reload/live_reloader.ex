@@ -73,7 +73,7 @@ defmodule Phoenix.LiveReloader do
 
       if inject?(conn, resp_body) do
         [page | rest] = String.split(resp_body, "</body>")
-        body = page <> reload_assets_tag() <> Enum.join(["</body>" | rest], "")
+        body = page <> reload_assets_tag(conn) <> Enum.join(["</body>" | rest], "")
 
         put_in conn.resp_body, body
       else
@@ -91,9 +91,10 @@ defmodule Phoenix.LiveReloader do
   defp html_content_type?([]), do: false
   defp html_content_type?([type | _]), do: String.starts_with?(type, "text/html")
 
-  defp reload_assets_tag() do
+  defp reload_assets_tag(conn) do
+    path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame")
     """
-    <iframe src="/phoenix/live_reload/frame" style="display: none;"></iframe>
+    <iframe src="#{path}" style="display: none;"></iframe>
     """
   end
 end
