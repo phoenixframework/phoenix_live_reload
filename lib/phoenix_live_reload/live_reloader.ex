@@ -10,6 +10,7 @@ defmodule Phoenix.LiveReloader do
   in your Endpoint, ie:
 
       if code_reloading? do
+        socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
         plug Phoenix.CodeReloader
         plug Phoenix.LiveReloader
       end
@@ -59,10 +60,6 @@ defmodule Phoenix.LiveReloader do
     else
       conn
     end
-  end
-
-  socket "/phoenix/live_reload/listen" do
-    channel "phoenix:live_reload", Phoenix.LiveReload.Channel
   end
 
   get "/phoenix/live_reload/frame", Phoenix.LiveReload.Frame, :frame

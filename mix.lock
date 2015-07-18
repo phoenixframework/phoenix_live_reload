@@ -1,4 +1,4 @@
 %{"fs": {:hex, :fs, "0.9.1"},
-  "phoenix": {:hex, :phoenix, "0.13.0"},
-  "plug": {:hex, :plug, "0.12.2"},
+  "phoenix": {:git, "git://github.com/phoenixframework/phoenix.git", "3fc98f8b18095b6d155f5afd824f7c5e24447187", []},
+  "plug": {:hex, :plug, "0.13.0"},
   "poison": {:hex, :poison, "1.4.0"}}

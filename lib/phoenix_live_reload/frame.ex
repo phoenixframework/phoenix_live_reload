@@ -13,7 +13,7 @@ defmodule Phoenix.LiveReload.Frame do
 
   def call(conn, _) do
     config = conn.private.phoenix_endpoint.config(:live_reload)
-    url    = Path.join(config[:url] || "/", "phoenix/live_reload/listen")
+    url    = Path.join(config[:url] || "/", "phoenix/live_reload/socket")
 
     conn
     |> put_resp_content_type("text/html")
