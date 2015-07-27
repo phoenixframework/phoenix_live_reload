@@ -6,7 +6,7 @@ defmodule PhoenixLiveReload.Mixfile do
   def project do
     [app: :phoenix_live_reload,
      version: @version,
-     elixir: "~> 1.0",
+     elixir: "~> 1.0.2 or ~> 1.1-dev",
      deps: deps,
 
      # Hex
