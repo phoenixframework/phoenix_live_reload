@@ -11,7 +11,7 @@ defmodule PhoenixLiveReloadTest do
 
   defp conn(path) do
     conn(:get, path)
-    |> Plug.Conn.put_private(:phoenix_endpoint, MyApp)
+    |> Plug.Conn.put_private(:phoenix_endpoint, MyApp.Endpoint)
   end
 
   test "renders frame with phoenix.js" do
@@ -53,5 +53,4 @@ defmodule PhoenixLiveReloadTest do
     refute to_string(conn.resp_body) =~
            ~s(<iframe src="/phoenix/live_reload/frame")
   end
-
 end

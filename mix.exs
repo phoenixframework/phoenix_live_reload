@@ -26,7 +26,8 @@ defmodule PhoenixLiveReload.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :phoenix, :fs]]
+    [applications: [:logger, :phoenix, :fs],
+     mod: {Phoenix.LiveReload, []}]
   end
 
   defp deps do

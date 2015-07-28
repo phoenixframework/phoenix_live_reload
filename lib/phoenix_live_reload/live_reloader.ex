@@ -1,6 +1,4 @@
 defmodule Phoenix.LiveReloader do
-  use Phoenix.Router
-
   @moduledoc """
   Router for live-reload detection in development.
 
@@ -47,10 +45,40 @@ defmodule Phoenix.LiveReloader do
 
   """
 
-  def call(%Plug.Conn{path_info: ["phoenix", "live_reload" | _]} = conn, opts) do
+  import Plug.Conn
+
+  @behaviour Plug
+
+  phoenix_path = Application.app_dir(:phoenix, "priv/static/phoenix.js")
+  reload_path  = Application.app_dir(:phoenix_live_reload, "priv/static/phoenix_live_reload.js")
+  @external_resource phoenix_path
+  @external_resource reload_path
+  @phoenix_js File.read!(phoenix_path)
+  @phoenix_live_reload_js File.read!(reload_path)
+
+  def init(opts) do
+    opts
+  end
+
+  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame"]} = conn, _opts) do
+    config = conn.private.phoenix_endpoint.config(:live_reload)
+    url    = Path.join(config[:url] || "/", "phoenix/live_reload/socket")
+
     conn
-    |> super(opts)
-    |> halt
+    |> put_resp_content_type("text/html")
+    |> send_resp(200, """
+      <html><body>
+      <script>
+        #{@phoenix_js}
+
+        var phx = require("phoenix")
+        var socket = new phx.Socket("#{url}")
+
+        #{@phoenix_live_reload_js}
+      </script>
+      </body></html>
+    """)
+    |> halt()
   end
 
   def call(conn, _opts) do
@@ -62,8 +90,6 @@ defmodule Phoenix.LiveReloader do
     end
   end
 
-  get "/phoenix/live_reload/frame", Phoenix.LiveReload.Frame, :frame
-
   defp before_send_inject_reloader(conn) do
     register_before_send conn, fn conn ->
       resp_body = to_string(conn.resp_body)
@@ -71,7 +97,6 @@ defmodule Phoenix.LiveReloader do
       if inject?(conn, resp_body) do
         [page | rest] = String.split(resp_body, "</body>")
         body = page <> reload_assets_tag(conn) <> Enum.join(["</body>" | rest], "")
-
         put_in conn.resp_body, body
       else
         conn

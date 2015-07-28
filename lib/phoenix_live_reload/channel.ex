@@ -1,9 +1,10 @@
 defmodule Phoenix.LiveReload.Channel do
-  use Phoenix.Channel
-
   @moduledoc """
   Phoenix's live-reload channel
   """
+
+  use Phoenix.Channel
+  alias Phoenix.LiveReload.Digest
 
   def join("phoenix:live_reload", _msg, socket) do
     {:ok, _} = Application.ensure_all_started(:phoenix_live_reload)
@@ -16,14 +17,24 @@ defmodule Phoenix.LiveReload.Channel do
   def handle_info({_pid, {:fs, :file_event}, {path, _event}}, socket) do
     if matches_any_pattern?(path, socket.assigns[:patterns]) do
       asset_type = Path.extname(path) |> String.lstrip(?.)
+      case File.read(path) do
+        {:ok, source} ->
+          new = :erlang.md5(source)
+          old = Digest.get_and_update(path, new)
 
-      push socket, "assets_change", %{asset_type: asset_type}
+          if new != old do
+            push socket, "assets_change", %{asset_type: asset_type}
+          end
+        {:error, _} ->
+          Digest.delete(path)
+          push socket, "assets_change", %{asset_type: asset_type}
+      end
     end
 
     {:noreply, socket}
   end
 
-  def matches_any_pattern?(path, patterns) do
+  defp matches_any_pattern?(path, patterns) do
     path = to_string(path)
 
     Enum.any?(patterns, fn pattern ->

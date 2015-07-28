@@ -1,26 +1,68 @@
 defmodule Phoenix.LiveReload.ChannelTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
+  use Phoenix.ChannelTest
+
+  alias Phoenix.LiveReload.Digest
   alias Phoenix.LiveReload.Channel
 
-  @patterns [
-    ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
-    ~r{web/views/.*(ex)$},
-    ~r{web/templates/.*(eex)$}
-  ]
+  @endpoint MyApp.Endpoint
 
-  test "matches_any_pattern? returns true if any @patterns match changed path" do
-    assert Channel.matches_any_pattern?("web/templates/user/show.html.eex", @patterns)
-    assert Channel.matches_any_pattern?("a/b/c/web/views/user_view.ex", @patterns)
-    assert Channel.matches_any_pattern?("priv/static/js/app.js", @patterns)
-    assert Channel.matches_any_pattern?("priv/static/js/app.css", @patterns)
-    assert Channel.matches_any_pattern?("priv/static/js/app.png", @patterns)
+  defp file_event(path, event) do
+    {self(), {:fs, :file_event}, {path, event}}
   end
 
-  test "matches_any_pattern? returns false for _build directories" do
-    refute Channel.matches_any_pattern?("_build/app/web/templates/user/show.html.eex", @patterns)
-    refute Channel.matches_any_pattern?("a/b/c/_build/app/web/views/user_view.ex", @patterns)
-    refute Channel.matches_any_pattern?("_build/app/priv/static/js/app.js", @patterns)
-    refute Channel.matches_any_pattern?("_build/app/priv/static/js/app.css", @patterns)
-    refute Channel.matches_any_pattern?("_build/app/priv/static/js/app.png", @patterns)
+  setup do
+    Digest.clear
+    {:ok, _, socket} =
+      subscribe_and_join(Channel, "phoenix:live_reload", %{})
+    {:ok, socket: socket}
+  end
+
+  test "sends a notification when asset is created", %{socket: socket} do
+    send socket.channel_pid, file_event("priv/static/phoenix_live_reload.js", :created)
+    assert_push "assets_change", %{asset_type: "js"}
+  end
+
+  test "sends a notification when asset is removed", %{socket: socket} do
+    send socket.channel_pid, file_event("priv/static/long_gone.js", :removed)
+    assert_push "assets_change", %{asset_type: "js"}
+  end
+
+  test "does not send a notification when asset stays the same", %{socket: socket} do
+    send socket.channel_pid, file_event("priv/static/phoenix_live_reload.js", :created)
+    assert_push "assets_change", %{asset_type: "js"}
+
+    send socket.channel_pid, file_event("priv/static/phoenix_live_reload.js", :created)
+    refute_receive _anything, 100
+  end
+
+  test "does not send a notification when asset comes from _build", %{socket: socket} do
+    send socket.channel_pid, file_event("_build/test/lib/phoenix_live_reload/priv/static/phoenix_live_reload.js", :created)
+    refute_receive _anything, 100
+  end
+
+  test "sends notification for js", %{socket: socket} do
+    send socket.channel_pid, file_event("priv/static/phoenix_live_reload.js", :created)
+    assert_push "assets_change", %{asset_type: "js"}
+  end
+
+  test "sends notification for css", %{socket: socket} do
+    send socket.channel_pid, file_event("priv/static/phoenix_live_reload.css", :created)
+    assert_push "assets_change", %{asset_type: "css"}
+  end
+
+  test "sends notification for images", %{socket: socket} do
+    send socket.channel_pid, file_event("priv/static/phoenix_live_reload.png", :created)
+    assert_push "assets_change", %{asset_type: "png"}
+  end
+
+  test "sends notification for templates", %{socket: socket} do
+    send socket.channel_pid, file_event("web/templates/user/show.html.eex", :created)
+    assert_push "assets_change", %{asset_type: "eex"}
+  end
+
+  test "sends notification for views", %{socket: socket} do
+    send socket.channel_pid, file_event('a/b/c/web/views/user_view.ex', :created)
+    assert_push "assets_change", %{asset_type: "ex"}
   end
 end
