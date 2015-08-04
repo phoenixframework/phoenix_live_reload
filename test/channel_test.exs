@@ -2,9 +2,7 @@ defmodule Phoenix.LiveReload.ChannelTest do
   use ExUnit.Case
   use Phoenix.ChannelTest
 
-  alias Phoenix.LiveReload.Digest
   alias Phoenix.LiveReload.Channel
-
   @endpoint MyApp.Endpoint
 
   defp file_event(path, event) do
@@ -12,7 +10,6 @@ defmodule Phoenix.LiveReload.ChannelTest do
   end
 
   setup do
-    Digest.clear
     {:ok, _, socket} =
       subscribe_and_join(Channel, "phoenix:live_reload", %{})
     {:ok, socket: socket}
@@ -26,14 +23,6 @@ defmodule Phoenix.LiveReload.ChannelTest do
   test "sends a notification when asset is removed", %{socket: socket} do
     send socket.channel_pid, file_event("priv/static/long_gone.js", :removed)
     assert_push "assets_change", %{asset_type: "js"}
-  end
-
-  test "does not send a notification when asset stays the same", %{socket: socket} do
-    send socket.channel_pid, file_event("priv/static/phoenix_live_reload.js", :created)
-    assert_push "assets_change", %{asset_type: "js"}
-
-    send socket.channel_pid, file_event("priv/static/phoenix_live_reload.js", :created)
-    refute_receive _anything, 100
   end
 
   test "does not send a notification when asset comes from _build", %{socket: socket} do
