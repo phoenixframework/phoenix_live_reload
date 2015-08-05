@@ -6,8 +6,8 @@ defmodule Phoenix.LiveReloader.Socket do
   use Phoenix.Socket
   channel "phoenix:live_reload", Phoenix.LiveReload.Channel
 
-  transport :websocket, Phoenix.Transports.WebSocket, log: false
-  transport :longpoll, Phoenix.Transports.LongPoll, log: false
+  transport :websocket, Phoenix.Transports.WebSocket, transport_log: false
+  transport :longpoll, Phoenix.Transports.LongPoll, transport_log: false
 
   def connect(_params, socket), do: {:ok, socket}
 
