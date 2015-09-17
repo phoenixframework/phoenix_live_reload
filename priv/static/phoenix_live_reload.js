@@ -2,9 +2,11 @@ var buildFreshUrl = function(link){
   var date    = Math.round(Date.now() / 1000).toString();
   var url     = link.href.replace(/(\&|\\?)vsn=\d*/, '');
   var newLink = document.createElement('link');
+  var onComplete = function() { link.remove() }
 
-  newLink.onerror = function(){ link.remove() }
-  newLink.onload  = function(){ link.remove() }
+  newLink.onerror = onComplete
+  newLink.onload  = onComplete
+  link.setAttribute('data-pending-removal', '');
   newLink.setAttribute('rel', 'stylesheet');
   newLink.setAttribute('type', 'text/css');
   newLink.setAttribute('href', url + (url.indexOf('?') >= 0 ? '&' : '?') +'vsn=' + date);
@@ -22,7 +24,7 @@ var repaint = function(){
 
 var cssStrategy = function(){
   var reloadableLinkElements = window.top.document.querySelectorAll(
-    'link[rel=stylesheet]:not([data-no-reload])'
+    'link[rel=stylesheet]:not([data-no-reload]):not([data-pending-removal])'
   );
 
   [].slice
