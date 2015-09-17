@@ -3,12 +3,11 @@ var buildFreshUrl = function(link){
   var url     = link.href.replace(/(\&|\\?)vsn=\d*/, '');
   var newLink = document.createElement('link');
 
+  newLink.onload = function(){ link.remove() }
   newLink.setAttribute('rel', 'stylesheet');
   newLink.setAttribute('type', 'text/css');
   newLink.setAttribute('href', url + (url.indexOf('?') >= 0 ? '&' : '?') +'vsn=' + date);
   link.parentNode.insertBefore(newLink, link.nextSibling);
-
-  newLink.onload = function(){ link.remove() }
 
   return newLink;
 };
