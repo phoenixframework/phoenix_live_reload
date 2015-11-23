@@ -35,20 +35,20 @@ var cssStrategy = function(){
   repaint();
 };
 
-var defaultStrategy = function(chan){
+var pageStrategy = function(chan){
   chan.off('assets_change');
   window.top.location.reload();
 };
 
 var reloadStrategies = {
   css: cssStrategy,
-  default: defaultStrategy
+  page: pageStrategy
 };
 
 socket.connect();
 var chan = socket.channel('phoenix:live_reload', {})
 chan.on('assets_change', function(msg) {
-  var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.default;
+  var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategy.page;
   reloadStrategy(chan);
 });
 chan.join();
