@@ -2,7 +2,7 @@ A project for live-reload functionality for [Phoenix](http://github.com/phoenixf
 
 ## Usage
 
-You can use `phoenix_live_reload` in your projects by adding it your `mix.exs` dependencies:
+You can use `phoenix_live_reload` in your projects by adding it to your `mix.exs` dependencies:
 
 ```elixir
 def deps do
