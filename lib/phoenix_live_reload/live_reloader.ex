@@ -60,9 +60,10 @@ defmodule Phoenix.LiveReloader do
     opts
   end
 
-  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame"]} = conn, _opts) do
-    config = conn.private.phoenix_endpoint.config(:live_reload)
-    url    = Path.join(config[:url] || "/", "phoenix/live_reload/socket")
+  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame"]} = conn , _) do
+    endpoint = conn.private.phoenix_endpoint
+    config = endpoint.config(:live_reload)
+    url    = config[:url] || endpoint.path("/phoenix/live_reload/socket")
 
     conn
     |> put_resp_content_type("text/html")
@@ -70,10 +71,7 @@ defmodule Phoenix.LiveReloader do
       <html><body>
       <script>
         #{@phoenix_js}
-
-        var phx = require("phoenix")
-        var socket = new phx.Socket("#{url}")
-
+        var socket = new Phoenix.Socket("#{url}")
         #{@phoenix_live_reload_js}
       </script>
       </body></html>
@@ -81,7 +79,7 @@ defmodule Phoenix.LiveReloader do
     |> halt()
   end
 
-  def call(conn, _opts) do
+  def call(conn, _) do
     patterns = get_in conn.private.phoenix_endpoint.config(:live_reload), [:patterns]
     if patterns && patterns != [] do
       before_send_inject_reloader(conn)
