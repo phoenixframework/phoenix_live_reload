@@ -65,8 +65,9 @@ defmodule Phoenix.LiveReloader do
   end
 
   def dispatch(["phoenix", "live_reload", "frame"], conn) do
-    config = conn.private.phoenix_endpoint.config(:live_reload)
-    url    = Path.join(config[:url] || "/", "phoenix/live_reload/socket")
+    endpoint = conn.private.phoenix_endpoint
+    config = endpoint.config(:live_reload)
+    url    = config[:url] || endpoint.path("/phoenix/live_reload/socket")
 
     conn
     |> put_resp_content_type("text/html")
