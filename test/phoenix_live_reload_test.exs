@@ -23,7 +23,21 @@ defmodule PhoenixLiveReloadTest do
            ~s[require("phoenix")]
     refute to_string(conn.resp_body) =~
            ~s[<iframe src="/phoenix/live_reload/frame"]
+
   end
+
+  test "renders frame with phoenix.js with script_name" do
+    conn = conn("/foo/bar/phoenix/live_reload/frame")
+           |> Map.put(:script_name, ["foo", "bar"])
+           |> Phoenix.LiveReloader.call([])
+
+    assert conn.status == 200
+    assert to_string(conn.resp_body) =~
+           ~s[require("phoenix")]
+    refute to_string(conn.resp_body) =~
+           ~s[<iframe src="/phoenix/live_reload/frame"]
+  end
+
 
   test "injects live_reload for html requests if configured and contains <body> tag" do
     opts = Phoenix.LiveReloader.init([])
