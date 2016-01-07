@@ -20,24 +20,11 @@ defmodule PhoenixLiveReloadTest do
 
     assert conn.status == 200
     assert to_string(conn.resp_body) =~
-           ~s[require("phoenix")]
+           ~s[Phoenix.Socket]
     refute to_string(conn.resp_body) =~
-           ~s[<iframe src="/phoenix/live_reload/frame"]
+           ~s[<iframe]
 
   end
-
-  test "renders frame with phoenix.js with script_name" do
-    conn = conn("/foo/bar/phoenix/live_reload/frame")
-           |> Map.put(:script_name, ["foo", "bar"])
-           |> Phoenix.LiveReloader.call([])
-
-    assert conn.status == 200
-    assert to_string(conn.resp_body) =~
-           ~s[require("phoenix")]
-    refute to_string(conn.resp_body) =~
-           ~s[<iframe src="/phoenix/live_reload/frame"]
-  end
-
 
   test "injects live_reload for html requests if configured and contains <body> tag" do
     opts = Phoenix.LiveReloader.init([])
@@ -48,6 +35,18 @@ defmodule PhoenixLiveReloadTest do
     assert to_string(conn.resp_body) ==
       "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" style=\"display: none;\"></iframe>\n</body></html>"
   end
+
+  test "injects live_reload with script_name" do
+    opts = Phoenix.LiveReloader.init([])
+    conn = conn("/")
+           |> put_private(:phoenix_endpoint, MyApp.EndpointScript)
+           |> put_resp_content_type("text/html")
+           |> Phoenix.LiveReloader.call(opts)
+           |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
+    assert to_string(conn.resp_body) ==
+      "<html><body><h1>Phoenix</h1><iframe src=\"/foo/bar/phoenix/live_reload/frame\" style=\"display: none;\"></iframe>\n</body></html>"
+  end
+
 
   test "skips live_reload injection if html response missing body tag" do
     opts = Phoenix.LiveReloader.init([])
