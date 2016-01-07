@@ -20,7 +20,7 @@ defmodule PhoenixLiveReload.Mixfile do
   end
 
   defp package do
-    [contributors: ["Chris McCord"],
+    [maintainers: ["Chris McCord"],
      licenses: ["MIT"],
      links: %{"GitHub" => "https://github.com/phoenixframework/phoenix_live_reload"}]
   end
