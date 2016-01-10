@@ -32,6 +32,7 @@ defmodule PhoenixLiveReload.Mixfile do
   defp deps do
     [{:phoenix, "~> 0.16 or ~> 1.0"},
      {:ex_doc, "~> 0.11", only: :docs},
+     {:earmark, ">= 0.0.0"},
      {:fs, "~> 0.9.1"}]
   end
 end
