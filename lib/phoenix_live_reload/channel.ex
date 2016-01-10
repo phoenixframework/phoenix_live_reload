@@ -4,6 +4,7 @@ defmodule Phoenix.LiveReload.Channel do
   """
 
   use Phoenix.Channel
+  require Logger
 
   def join("phoenix:live_reload", _msg, socket) do
     {:ok, _} = Application.ensure_all_started(:phoenix_live_reload)
@@ -16,6 +17,7 @@ defmodule Phoenix.LiveReload.Channel do
   def handle_info({_pid, {:fs, :file_event}, {path, _event}}, socket) do
     if matches_any_pattern?(path, socket.assigns[:patterns]) do
       asset_type = Path.extname(path) |> String.lstrip(?.)
+      Logger.debug "Live reload: #{Path.relative_to_cwd(path)}"
       push socket, "assets_change", %{asset_type: asset_type}
     end
 

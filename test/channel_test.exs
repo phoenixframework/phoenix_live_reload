@@ -4,6 +4,7 @@ defmodule Phoenix.LiveReload.ChannelTest do
 
   alias Phoenix.LiveReload.Channel
   @endpoint MyApp.Endpoint
+  @moduletag :capture_log
 
   defp file_event(path, event) do
     {self(), {:fs, :file_event}, {path, event}}
@@ -23,6 +24,14 @@ defmodule Phoenix.LiveReload.ChannelTest do
   test "sends a notification when asset is removed", %{socket: socket} do
     send socket.channel_pid, file_event("priv/static/long_gone.js", :removed)
     assert_push "assets_change", %{asset_type: "js"}
+  end
+
+  test "logs on live reload", %{socket: socket} do
+    content = ExUnit.CaptureLog.capture_log(fn ->
+      send socket.channel_pid, file_event("priv/static/long_gone.js", :removed)
+      assert_push "assets_change", %{asset_type: "js"}
+    end)
+    assert content =~ "[debug] Live reload: priv/static/long_gone.js"
   end
 
   test "does not send a notification when asset comes from _build", %{socket: socket} do
