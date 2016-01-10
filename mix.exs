@@ -1,7 +1,7 @@
 defmodule PhoenixLiveReload.Mixfile do
   use Mix.Project
 
-  @version "1.0.2"
+  @version "1.0.3"
 
   def project do
     [app: :phoenix_live_reload,
@@ -31,7 +31,7 @@ defmodule PhoenixLiveReload.Mixfile do
 
   defp deps do
     [{:phoenix, "~> 0.16 or ~> 1.0"},
-     {:ex_doc, "~> 0.7.1", only: :docs},
+     {:ex_doc, "~> 0.11", only: :docs},
      {:fs, "~> 0.9.1"}]
   end
 end
