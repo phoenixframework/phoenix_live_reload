@@ -12,7 +12,7 @@ defmodule Phoenix.LiveReload.ChannelTest do
 
   setup do
     {:ok, _, socket} =
-      subscribe_and_join(Channel, "phoenix:live_reload", %{})
+      socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
     {:ok, socket: socket}
   end
 

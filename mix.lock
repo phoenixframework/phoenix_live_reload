@@ -1,6 +1,7 @@
 %{"earmark": {:hex, :earmark, "0.2.0"},
   "ex_doc": {:hex, :ex_doc, "0.11.3"},
   "fs": {:hex, :fs, "0.9.2"},
-  "phoenix": {:hex, :phoenix, "0.16.0"},
-  "plug": {:hex, :plug, "0.14.0"},
-  "poison": {:hex, :poison, "1.4.0"}}
+  "phoenix": {:hex, :phoenix, "1.2.0-rc.0"},
+  "phoenix_pubsub": {:hex, :phoenix_pubsub, "1.0.0-rc.0"},
+  "plug": {:hex, :plug, "1.1.4"},
+  "poison": {:hex, :poison, "2.1.0"}}
