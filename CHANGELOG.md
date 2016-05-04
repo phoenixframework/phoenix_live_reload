@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.5 (2016-05-04)
+
+* Bug fixes
+  * Do not include hard earmark requirement
+
+## 1.0.4 (2016-04-29)
+
+* Enhancements
+  * Support Phoenix v1.2
+
 ## 1.0.3 (2016-01-11)
 
 * Enhancements
