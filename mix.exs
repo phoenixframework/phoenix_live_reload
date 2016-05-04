@@ -32,7 +32,7 @@ defmodule PhoenixLiveReload.Mixfile do
   defp deps do
     [{:phoenix, "~> 1.0 or ~> 1.2-rc"},
      {:ex_doc, "~> 0.11", only: :docs},
-     {:earmark, ">= 0.0.0"},
+     {:earmark, ">= 0.0.0", only: :docs},
      {:fs, "~> 0.9.1"}]
   end
 end
