@@ -112,9 +112,8 @@ defmodule Phoenix.LiveReloader do
   defp html_content_type?([type | _]), do: String.starts_with?(type, "text/html")
 
   defp reload_assets_tag(conn) do
-    path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame")
     """
-    <iframe src="#{path}" style="display: none;"></iframe>
+    <iframe src="/phoenix/live_reload/frame" style="display: none;"></iframe>
     """
   end
 end
