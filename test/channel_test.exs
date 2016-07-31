@@ -39,6 +39,11 @@ defmodule Phoenix.LiveReload.ChannelTest do
     refute_receive _anything, 100
   end
 
+  test "it allows project names containing _build", %{socket: socket} do
+    send socket.channel_pid, file_event("/Users/auser/www/widget_builder/web/templates/layout/app.html.eex", :created)
+    assert_push "assets_change", %{asset_type: "eex"}
+  end
+
   test "sends notification for js", %{socket: socket} do
     send socket.channel_pid, file_event("priv/static/phoenix_live_reload.js", :created)
     assert_push "assets_change", %{asset_type: "js"}
