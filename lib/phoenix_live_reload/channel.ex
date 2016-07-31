@@ -28,7 +28,7 @@ defmodule Phoenix.LiveReload.Channel do
     path = to_string(path)
 
     Enum.any?(patterns, fn pattern ->
-      String.match?(path, pattern) and !String.match?(path, ~r/_build/)
+      String.match?(path, pattern) and !String.match?(path, ~r{(^|/)_build/})
     end)
   end
 end
