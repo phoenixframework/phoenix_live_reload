@@ -80,19 +80,20 @@ defmodule Phoenix.LiveReloader do
   end
 
   def call(conn, _) do
-    patterns = get_in conn.private.phoenix_endpoint.config(:live_reload), [:patterns]
+    endpoint = conn.private.phoenix_endpoint
+    patterns = get_in endpoint.config(:live_reload), [:patterns]
     if patterns && patterns != [] do
-      before_send_inject_reloader(conn)
+      before_send_inject_reloader(conn, endpoint)
     else
       conn
     end
   end
 
-  defp before_send_inject_reloader(conn) do
+  defp before_send_inject_reloader(conn, endpoint) do
     register_before_send conn, fn conn ->
       resp_body = to_string(conn.resp_body)
 
-      if inject?(conn, resp_body) do
+      if inject?(conn, resp_body) && :code.is_loaded(endpoint) do
         [page | rest] = String.split(resp_body, "</body>")
         body = page <> reload_assets_tag(conn) <> Enum.join(["</body>" | rest], "")
         put_in conn.resp_body, body

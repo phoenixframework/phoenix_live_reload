@@ -7,11 +7,11 @@ defmodule PhoenixLiveReload.Mixfile do
     [app: :phoenix_live_reload,
      version: @version,
      elixir: "~> 1.0.2 or ~> 1.1",
-     deps: deps,
+     deps: deps(),
 
      # Hex
      description: "Provides live-reload functionality for Phoenix",
-     package: package,
+     package: package(),
 
      # Docs
      name: "Phoenix Live-Reload",
