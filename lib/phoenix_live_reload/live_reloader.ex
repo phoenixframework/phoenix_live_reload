@@ -18,30 +18,30 @@ defmodule Phoenix.LiveReloader do
   For live-reloading in development, add the following `:live_reload`
   configuration to your Endpoint with a list of patterns to watch for changes:
 
-   config :my_app, MyApp.Endpoint,
-     ...
-     live_reload: [
-       patterns: [
-         ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
-         ~r{web/views/.*(ex)$},
-         ~r{web/templates/.*(eex)$}
-       ]
-     ]
+      config :my_app, MyApp.Endpoint,
+      ...
+      live_reload: [
+        patterns: [
+          ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+          ~r{web/views/.*(ex)$},
+          ~r{web/templates/.*(eex)$}
+        ]
+      ]
 
 
   By default the URL of the live-reload connection will use the browser's
   host and port. To override this, you can pass the `:url` option, ie:
 
-   config :my_app, MyApp.Endpoint,
-     ...
-     live_reload: [
-       url: "ws://localhost:4000",
-       patterns: [
-         ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
-         ~r{web/views/.*(ex)$},
-         ~r{web/templates/.*(eex)$}
-       ]
-     ]
+      config :my_app, MyApp.Endpoint,
+      ...
+      live_reload: [
+        url: "ws://localhost:4000",
+        patterns: [
+          ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+          ~r{web/views/.*(ex)$},
+          ~r{web/templates/.*(eex)$}
+        ]
+      ]
 
   """
 
