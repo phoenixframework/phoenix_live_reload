@@ -28,4 +28,4 @@ All stylesheets are reloaded without a page refresh anytime a style is detected 
 
 ## License
 
-Same license as Phoenix.
+[Same license as Phoenix](https://github.com/phoenixframework/phoenix/blob/master/LICENSE.md).
