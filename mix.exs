@@ -1,7 +1,7 @@
 defmodule PhoenixLiveReload.Mixfile do
   use Mix.Project
 
-  @version "1.0.5"
+  @version "1.0.6"
 
   def project do
     [app: :phoenix_live_reload,

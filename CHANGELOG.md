@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.6 (2016-11-29)
+
+* Bug fixes
+  * Remove warnings on Elixir v1.4
+  * Do not try to access the endpoint if it is no longer loaded
+
 ## 1.0.5 (2016-05-04)
 
 * Bug fixes
