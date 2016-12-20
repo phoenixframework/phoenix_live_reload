@@ -33,6 +33,6 @@ defmodule PhoenixLiveReload.Mixfile do
     [{:phoenix, "~> 1.0 or ~> 1.2-rc"},
      {:ex_doc, "~> 0.11", only: :docs},
      {:earmark, ">= 0.0.0", only: :docs},
-     {:fs, "~> 0.9.1"}]
+     {:fs, "~> 2.12.0"}]
   end
 end
