@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.7 (2017-01-18)
+
+* Enhancements
+  * Update to latest `:fs` 2.12
+
 ## 1.0.6 (2016-11-29)
 
 * Bug fixes
