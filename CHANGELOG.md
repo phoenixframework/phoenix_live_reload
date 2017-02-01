@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.8 (2017-02-01)
+
+* Enhancements
+  * Revert to `:fs` 0.9.1 to side-step rebar build problems
+
 ## 1.0.7 (2017-01-18)
 
 * Enhancements
