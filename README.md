@@ -25,6 +25,10 @@ All stylesheets are reloaded without a page refresh anytime a style is detected 
 
     <link rel="stylesheet" href="http://example.com/style.css" data-no-reload>
 
+## Differences between [Phoenix.CodeReloader](https://hexdocs.pm/phoenix/Phoenix.CodeReloader.html#content)
+[Phoenix.CodeReloader](https://hexdocs.pm/phoenix/Phoenix.CodeReloader.html#content) reloads code in the web and lib directories. This means that if you change anything in the web or lib directories (such as a controller) then the Elixir code will be reloaded and used on your next request. You can also specify external watchers (brunch or webpack) in your Endpoint for non-Elixir code.
+
+In contrast, this project adds a plug which injects some JavaScript into your page with a WebSocket connection to the server. When you make a change to anything in your config for live\_reload (JavaScript, stylesheets, templates and views by default) then the page will be reloaded in response to a message sent via the WebSocket. If the change was to an Elixir file then it will be recompiled and served when the page is reloaded. If it is JavaScript or CSS then it will be handled by the watchers (brunch by default).
 
 ## License
 
