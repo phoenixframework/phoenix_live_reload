@@ -16,7 +16,7 @@ defmodule Phoenix.LiveReload.Channel do
 
   def handle_info({_pid, {:fs, :file_event}, {path, _event}}, socket) do
     if matches_any_pattern?(path, socket.assigns[:patterns]) do
-      asset_type = String.replace(Path.extname(path), ~r/^\.+/,  "")
+      asset_type = remove_leading_dot(Path.extname(path))
       Logger.debug "Live reload: #{Path.relative_to_cwd(path)}"
       push socket, "assets_change", %{asset_type: asset_type}
     end
@@ -31,4 +31,7 @@ defmodule Phoenix.LiveReload.Channel do
       String.match?(path, pattern) and !String.match?(path, ~r{(^|/)_build/})
     end)
   end
+
+  defp remove_leading_dot("." <> rest), do: rest
+  defp remove_leading_dot(rest), do: rest
 end
