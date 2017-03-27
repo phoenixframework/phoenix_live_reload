@@ -16,7 +16,7 @@ defmodule Phoenix.LiveReload.Channel do
 
   def handle_info({_pid, {:fs, :file_event}, {path, _event}}, socket) do
     if matches_any_pattern?(path, socket.assigns[:patterns]) do
-      asset_type = Path.extname(path) |> String.lstrip(?.)
+      asset_type = String.replace(Path.extname(path), ~r/^\.+/,  "")
       Logger.debug "Live reload: #{Path.relative_to_cwd(path)}"
       push socket, "assets_change", %{asset_type: asset_type}
     end
