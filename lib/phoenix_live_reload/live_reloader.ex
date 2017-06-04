@@ -116,9 +116,8 @@ defmodule Phoenix.LiveReloader do
   defp has_body?(resp_body), do: String.contains?(resp_body, "<body")
 
   defp reload_assets_tag(conn) do
-    path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame")
     """
-    <iframe src="#{path}" style="display: none;"></iframe>
+    <iframe src="/phoenix/live_reload/frame" style="display: none;"></iframe>
     """
   end
 end
