@@ -89,9 +89,13 @@ defmodule Phoenix.LiveReloader do
     end
   end
 
-  defp before_send_inject_reloader(conn, endpoint) do
+  defp before_send_inject_reloader(%{resp_body: resp_body} = conn, endpoint) do
     register_before_send conn, fn conn ->
-      resp_body = to_string(conn.resp_body)
+      resp_body = if is_list(resp_body) do
+        IO.iodata_to_binary(resp_body)
+      else
+        to_string(resp_body)
+      end
 
       if inject?(conn, resp_body) && :code.is_loaded(endpoint) do
         [page | rest] = String.split(resp_body, "</body>")
