@@ -90,31 +90,30 @@ defmodule Phoenix.LiveReloader do
   end
 
   defp before_send_inject_reloader(%{resp_body: resp_body} = conn, endpoint) do
-    register_before_send conn, fn conn ->
-      resp_body = if is_list(resp_body) do
-        IO.iodata_to_binary(resp_body)
-      else
-        to_string(resp_body)
-      end
-
-      if inject?(conn, resp_body) && :code.is_loaded(endpoint) do
-        [page | rest] = String.split(resp_body, "</body>")
-        body = page <> reload_assets_tag(conn) <> Enum.join(["</body>" | rest], "")
-        put_in conn.resp_body, body
+    register_before_send(conn, fn conn ->
+      if html?(conn) do
+        resp_body = IO.iodata_to_binary(resp_body)
+        if has_body?(resp_body) and :code.is_loaded(endpoint) do
+          [page | rest] = String.split(resp_body, "</body>")
+          body = page <> reload_assets_tag(conn) <> Enum.join(["</body>" | rest], "")
+          put_in conn.resp_body, body
+        else
+          conn
+        end
       else
         conn
       end
+    end)
+  end
+
+  defp html?(conn) do
+    case get_resp_header(conn, "content-type") do
+      [] -> false
+      [type | _] -> String.starts_with?(type, "text/html")
     end
   end
 
-  defp inject?(conn, resp_body) do
-    conn
-    |> get_resp_header("content-type")
-    |> html_content_type?
-    |> Kernel.&&(String.contains?(resp_body, "<body"))
-  end
-  defp html_content_type?([]), do: false
-  defp html_content_type?([type | _]), do: String.starts_with?(type, "text/html")
+  defp has_body?(resp_body), do: String.contains?(resp_body, "<body")
 
   defp reload_assets_tag(conn) do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame")
