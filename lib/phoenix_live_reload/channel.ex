@@ -9,12 +9,12 @@ defmodule Phoenix.LiveReload.Channel do
   def join("phoenix:live_reload", _msg, socket) do
     {:ok, _} = Application.ensure_all_started(:phoenix_live_reload)
     patterns = socket.endpoint.config(:live_reload)[:patterns]
-    :fs.subscribe()
+    FileSystem.subscribe(:pnx_live_reload_file_monitor)
 
     {:ok, assign(socket, :patterns, patterns)}
   end
 
-  def handle_info({_pid, {:fs, :file_event}, {path, _event}}, socket) do
+  def handle_info({:file_event, _pid, {path, _event}}, socket) do
     if matches_any_pattern?(path, socket.assigns[:patterns]) do
       asset_type = remove_leading_dot(Path.extname(path))
       Logger.debug "Live reload: #{Path.relative_to_cwd(path)}"

@@ -7,7 +7,7 @@ defmodule Phoenix.LiveReload.ChannelTest do
   @moduletag :capture_log
 
   defp file_event(path, event) do
-    {self(), {:fs, :file_event}, {path, event}}
+    {:file_event, self(), {path, event}}
   end
 
   setup do
