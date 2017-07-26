@@ -89,10 +89,10 @@ defmodule Phoenix.LiveReloader do
     end
   end
 
-  defp before_send_inject_reloader(%{resp_body: resp_body} = conn, endpoint) do
+  defp before_send_inject_reloader(conn, endpoint) do
     register_before_send(conn, fn conn ->
       if html?(conn) do
-        resp_body = IO.iodata_to_binary(resp_body)
+        resp_body = IO.iodata_to_binary(conn.resp_body)
         if has_body?(resp_body) and :code.is_loaded(endpoint) do
           [page | rest] = String.split(resp_body, "</body>")
           body = page <> reload_assets_tag(conn) <> Enum.join(["</body>" | rest], "")
