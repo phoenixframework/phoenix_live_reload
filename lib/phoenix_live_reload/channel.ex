@@ -9,7 +9,7 @@ defmodule Phoenix.LiveReload.Channel do
   def join("phoenix:live_reload", _msg, socket) do
     {:ok, _} = Application.ensure_all_started(:phoenix_live_reload)
     patterns = socket.endpoint.config(:live_reload)[:patterns]
-    FileSystem.subscribe(:pnx_live_reload_file_monitor)
+    FileSystem.subscribe(:phoenix_live_reload_file_monitor)
 
     {:ok, assign(socket, :patterns, patterns)}
   end
