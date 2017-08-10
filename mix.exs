@@ -1,7 +1,7 @@
 defmodule PhoenixLiveReload.Mixfile do
   use Mix.Project
 
-  @version "1.0.8"
+  @version "1.1.0"
 
   def project do
     [app: :phoenix_live_reload,
@@ -20,20 +20,26 @@ defmodule PhoenixLiveReload.Mixfile do
   end
 
   defp package do
-    [maintainers: ["Chris McCord"],
-     licenses: ["MIT"],
-     links: %{"GitHub" => "https://github.com/phoenixframework/phoenix_live_reload"}]
+    [
+      maintainers: ["Chris McCord"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/phoenixframework/phoenix_live_reload"}
+    ]
   end
 
   def application do
-    [mod: {PhoenixLiveReload.Application, []}, applications: [:logger, :phoenix]]
+    [
+      mod: {PhoenixLiveReload.Application, []},
+      applications: [:logger, :phoenix, :file_system]
+    ]
   end
 
   defp deps do
-    [{:phoenix, "~> 1.0 or ~> 1.2-rc"},
-     {:ex_doc, "~> 0.11", only: :docs},
-     {:earmark, ">= 0.0.0", only: :docs},
-     {:file_system, "~> 0.1.3"},
+    [
+      {:phoenix, "~> 1.0 or ~> 1.2-rc"},
+      {:ex_doc, "~> 0.11", only: :docs},
+      {:earmark, ">= 0.0.0", only: :docs},
+      {:file_system, "~> 0.1"},
     ]
   end
 end
