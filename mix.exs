@@ -6,7 +6,7 @@ defmodule PhoenixLiveReload.Mixfile do
   def project do
     [app: :phoenix_live_reload,
      version: @version,
-     elixir: "~> 1.0.2 or ~> 1.1",
+     elixir: "~> 1.3",
      deps: deps(),
 
      # Hex
@@ -26,13 +26,14 @@ defmodule PhoenixLiveReload.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :phoenix, :fs]]
+    [mod: {PhoenixLiveReload.Application, []}, applications: [:logger, :phoenix]]
   end
 
   defp deps do
     [{:phoenix, "~> 1.0 or ~> 1.2-rc"},
      {:ex_doc, "~> 0.11", only: :docs},
      {:earmark, ">= 0.0.0", only: :docs},
-     {:fs, "~> 0.9.1"}]
+     {:file_system, "~> 0.1.3"},
+    ]
   end
 end
