@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0 (2017-08-10)
+
+* Enhancements
+  * Use `:file_system` for file change notifications for improved reliability
+
 ## 1.0.8 (2017-02-01)
 
 * Enhancements
