@@ -6,7 +6,7 @@ You can use `phoenix_live_reload` in your projects by adding it to your `mix.exs
 
 ```elixir
 def deps do
-  [{:phoenix_live_reload, "~> 1.0"}]
+  [{:phoenix_live_reload, "~> 1.1"}]
 end
 ```
 
