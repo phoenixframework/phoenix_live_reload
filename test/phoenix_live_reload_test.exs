@@ -66,4 +66,15 @@ defmodule PhoenixLiveReloadTest do
     refute to_string(conn.resp_body) =~
            ~s(<iframe src="/phoenix/live_reload/frame")
   end
+
+  test "skips live_reload if body is nil" do
+    opts = Phoenix.LiveReloader.init([])
+    conn = conn("/")
+           |> put_resp_content_type("text/html")
+           |> Phoenix.LiveReloader.call(opts)
+           |> send_file(200, Path.join(File.cwd!, "README.md"))
+    assert conn.status == 200
+    refute to_string(conn.resp_body) =~
+           ~s(<iframe src="/phoenix/live_reload/frame")
+  end
 end
