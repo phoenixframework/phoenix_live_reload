@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1 (2017-08-27)
+
+* Enhancements
+  * Bump `:file_system` requirement
+
+* Bug fixes
+  * Do not raise when response has no body
+
 ## 1.1.0 (2017-08-10)
 
 * Enhancements
