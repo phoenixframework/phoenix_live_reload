@@ -12,7 +12,7 @@ end
 
 ## Backends
 
-This project uses [`fs`](https://github.com/synrc/fs) as a dependency to watch your filesystem whenever there is a change and it supports the following operating systems:
+This project uses [`FileSystem`](https://github.com/falood/file_system) as a dependency to watch your filesystem whenever there is a change and it supports the following operating systems:
 
 * Linux via [inotify](https://github.com/rvoicilas/inotify-tools/wiki) (installation required)
 * Windows via [inotify-win](https://github.com/thekid/inotify-win) (no installation required)
