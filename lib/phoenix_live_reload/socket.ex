@@ -4,7 +4,7 @@ defmodule Phoenix.LiveReloader.Socket do
   """
 
   use Phoenix.Socket
-  channel "phoenix:live_reload", Phoenix.LiveReload.Channel
+  channel "phoenix:live_reload", Phoenix.LiveReloader.Channel
 
   transport :websocket, Phoenix.Transports.WebSocket
   transport :longpoll, Phoenix.Transports.LongPoll

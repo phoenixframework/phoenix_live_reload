@@ -1,4 +1,4 @@
-defmodule PhoenixLiveReloadTest do
+defmodule Phoenix.LiveReloaderTest do
   use ExUnit.Case, async: true
 
   import Plug.Test

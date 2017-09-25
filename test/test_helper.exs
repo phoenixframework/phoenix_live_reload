@@ -1,5 +1,5 @@
 Application.put_env(:phoenix_live_reload, MyApp.Endpoint,
-  pubsub: [adapter: Phoenix.PubSub.PG2, name: Phoenix.LiveReload.PubSub],
+  pubsub: [adapter: Phoenix.PubSub.PG2, name: Phoenix.LiveReloader.PubSub],
   live_reload:
     [url: "ws://localhost:4000",
      patterns: [

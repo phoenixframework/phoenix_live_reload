@@ -1,8 +1,8 @@
-defmodule Phoenix.LiveReload.ChannelTest do
+defmodule Phoenix.LiveReloader.ChannelTest do
   use ExUnit.Case
   use Phoenix.ChannelTest
 
-  alias Phoenix.LiveReload.Channel
+  alias Phoenix.LiveReloader.Channel
   @endpoint MyApp.Endpoint
   @moduletag :capture_log
 

@@ -29,7 +29,7 @@ defmodule PhoenixLiveReload.Mixfile do
 
   def application do
     [
-      mod: {PhoenixLiveReload.Application, []},
+      mod: {Phoenix.LiveReloader.Application, []},
       applications: [:logger, :phoenix, :file_system]
     ]
   end

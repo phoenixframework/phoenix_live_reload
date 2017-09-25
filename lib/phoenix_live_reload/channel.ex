@@ -1,4 +1,4 @@
-defmodule Phoenix.LiveReload.Channel do
+defmodule Phoenix.LiveReloader.Channel do
   @moduledoc """
   Phoenix's live-reload channel
   """
@@ -9,9 +9,13 @@ defmodule Phoenix.LiveReload.Channel do
   def join("phoenix:live_reload", _msg, socket) do
     {:ok, _} = Application.ensure_all_started(:phoenix_live_reload)
     patterns = socket.endpoint.config(:live_reload)[:patterns]
-    FileSystem.subscribe(:phoenix_live_reload_file_monitor)
 
-    {:ok, assign(socket, :patterns, patterns)}
+    if Process.whereis(:phoenix_live_reload_file_monitor) do
+      FileSystem.subscribe(:phoenix_live_reload_file_monitor)
+      {:ok, assign(socket, :patterns, patterns)}
+    else
+      :ignore
+    end
   end
 
   def handle_info({:file_event, _pid, {path, _event}}, socket) do
