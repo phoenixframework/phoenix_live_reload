@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2 (2017-09-25)
+
+* Enhancements
+  * Improve error messages
+
 ## 1.1.1 (2017-08-27)
 
 * Enhancements
