@@ -1,8 +1,7 @@
 defmodule Phoenix.LiveReloader.Channel do
   @moduledoc """
-  Phoenix's live-reload channel
+  Phoenix's live-reload channel.
   """
-
   use Phoenix.Channel
   require Logger
 
@@ -14,7 +13,7 @@ defmodule Phoenix.LiveReloader.Channel do
       FileSystem.subscribe(:phoenix_live_reload_file_monitor)
       {:ok, assign(socket, :patterns, patterns)}
     else
-      :ignore
+      {:error, %{message: "live reload backend not running"}}
     end
   end
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.3 (2017-09-25)
+
+* Bug fix
+  * Do not return unsupported `:ignore` from live channel
+
 ## 1.1.2 (2017-09-25)
 
 * Enhancements
