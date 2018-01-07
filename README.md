@@ -10,6 +10,20 @@ def deps do
 end
 ```
 
+You can configure the reloading interval(ms) in your `config/dev.exs`:
+
+```elixir
+# Watch static and templates for browser reloading.
+config :nohogu, NohoguWeb.Endpoint,
+  live_reload: [
+    interval: 3000,
+    patterns: [
+    ...
+```
+
+Default interval is 1000 ms.
+
+
 ## Backends
 
 This project uses [`FileSystem`](https://github.com/falood/file_system) as a dependency to watch your filesystem whenever there is a change and it supports the following operating systems:
