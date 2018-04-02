@@ -23,7 +23,7 @@ var repaint = function(){
 };
 
 var cssStrategy = function(){
-  var reloadableLinkElements = window.top.document.querySelectorAll(
+  var reloadableLinkElements = window.parent.document.querySelectorAll(
     'link[rel=stylesheet]:not([data-no-reload]):not([data-pending-removal])'
   );
 
