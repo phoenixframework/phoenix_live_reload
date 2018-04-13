@@ -2,7 +2,11 @@ var buildFreshUrl = function(link){
   var date    = Math.round(Date.now() / 1000).toString();
   var url     = link.href.replace(/(\&|\\?)vsn=\d*/, '');
   var newLink = document.createElement('link');
-  var onComplete = function() { link.remove() }
+  var onComplete = function() {
+    if (link.parentNode !== null) {
+      link.parentNode.removeChild(link);
+    }
+  };
 
   newLink.onerror = onComplete
   newLink.onload  = onComplete
