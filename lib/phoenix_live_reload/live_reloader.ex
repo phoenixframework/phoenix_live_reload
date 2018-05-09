@@ -73,7 +73,7 @@ defmodule Phoenix.LiveReloader do
     endpoint = conn.private.phoenix_endpoint
     config = endpoint.config(:live_reload)
     url = config[:url] || endpoint.path("/phoenix/live_reload/socket")
-    interval = config[:interval] || 1000
+    interval = config[:interval] || 100
 
     conn
     |> put_resp_content_type("text/html")

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.5
+
+* Bug fix
+  * Use proper default interval of 100ms
+
 ## 1.1.4
 
 * Enhancements
