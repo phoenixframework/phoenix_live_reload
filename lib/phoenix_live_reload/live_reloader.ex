@@ -64,6 +64,7 @@ defmodule Phoenix.LiveReloader do
     endpoint = conn.private.phoenix_endpoint
     config = endpoint.config(:live_reload)
     url    = config[:url] || endpoint.path("/phoenix/live_reload/socket")
+    interval = config[:interval] || 1000
 
     conn
     |> put_resp_content_type("text/html")
@@ -72,6 +73,7 @@ defmodule Phoenix.LiveReloader do
       <script>
         #{@phoenix_js}
         var socket = new Phoenix.Socket("#{url}")
+        var interval = #{interval}
         #{@phoenix_live_reload_js}
       </script>
       </body></html>
