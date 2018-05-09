@@ -46,15 +46,24 @@ defmodule Phoenix.LiveReloader do
   """
 
   import Plug.Conn
-
   @behaviour Plug
 
   phoenix_path = Application.app_dir(:phoenix, "priv/static/phoenix.js")
-  reload_path  = Application.app_dir(:phoenix_live_reload, "priv/static/phoenix_live_reload.js")
+  reload_path = Application.app_dir(:phoenix_live_reload, "priv/static/phoenix_live_reload.js")
   @external_resource phoenix_path
   @external_resource reload_path
-  @phoenix_js File.read!(phoenix_path)
-  @phoenix_live_reload_js File.read!(reload_path)
+
+  @html_before  """
+  <html><body>
+  <script>
+    #{File.read!(phoenix_path)}
+  """
+
+  @html_after """
+    #{File.read!(reload_path)}
+  </script>
+  </body></html>
+  """
 
   def init(opts) do
     opts
@@ -63,21 +72,17 @@ defmodule Phoenix.LiveReloader do
   def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame"]} = conn , _) do
     endpoint = conn.private.phoenix_endpoint
     config = endpoint.config(:live_reload)
-    url    = config[:url] || endpoint.path("/phoenix/live_reload/socket")
+    url = config[:url] || endpoint.path("/phoenix/live_reload/socket")
     interval = config[:interval] || 1000
 
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, """
-      <html><body>
-      <script>
-        #{@phoenix_js}
-        var socket = new Phoenix.Socket("#{url}")
-        var interval = #{interval}
-        #{@phoenix_live_reload_js}
-      </script>
-      </body></html>
-    """)
+    |> send_resp(200, [
+      @html_before,
+      "var socket = new Phoenix.Socket(\"#{url}\");\n",
+      "var interval = #{interval};\n",
+      @html_after
+    ])
     |> halt()
   end
 

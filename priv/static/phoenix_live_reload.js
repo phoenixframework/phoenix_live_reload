@@ -1,6 +1,6 @@
 var buildFreshUrl = function(link){
-  var date    = Math.round(Date.now() / 1000).toString();
-  var url     = link.href.replace(/(\&|\\?)vsn=\d*/, '');
+  var date = Math.round(Date.now() / 1000).toString();
+  var url = link.href.replace(/(\&|\\?)vsn=\d*/, '');
   var newLink = document.createElement('link');
   var onComplete = function() {
     if (link.parentNode !== null) {
@@ -8,8 +8,8 @@ var buildFreshUrl = function(link){
     }
   };
 
-  newLink.onerror = onComplete
-  newLink.onload  = onComplete
+  newLink.onerror = onComplete;
+  newLink.onload  = onComplete;
   link.setAttribute('data-pending-removal', '');
   newLink.setAttribute('rel', 'stylesheet');
   newLink.setAttribute('type', 'text/css');

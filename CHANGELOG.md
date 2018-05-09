@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.4
+
+* Enhancements
+  * Support `:interval` configuration for cases where the live reloading was triggering too fast
+
+* Bug fix
+  * Support IE11
+  * Fix CSS reloading in iframe
+
 ## 1.1.3 (2017-09-25)
 
 * Bug fix

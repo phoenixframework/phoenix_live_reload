@@ -10,19 +10,18 @@ def deps do
 end
 ```
 
-You can configure the reloading interval(ms) in your `config/dev.exs`:
+You can configure the reloading interval in ms in your `config/dev.exs`:
 
 ```elixir
 # Watch static and templates for browser reloading.
-config :nohogu, NohoguWeb.Endpoint,
+config :my_app, MyAppWeb.Endpoint,
   live_reload: [
-    interval: 3000,
+    interval: 1000,
     patterns: [
-    ...
+      ...
 ```
 
-Default interval is 1000 ms.
-
+The default interval is 100ms.
 
 ## Backends
 
