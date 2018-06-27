@@ -11,6 +11,13 @@ defmodule Phoenix.LiveReloader.Application do
 
   def start_link do
     opts = [dirs: [Path.absname("")], name: :phoenix_live_reload_file_monitor]
+
+    backend = Application.get_env(:phoenix_live_reload, :backend)
+
+    opts = if !is_nil(backend) do
+        opts ++ [backend: backend]
+    end
+
     case FileSystem.start_link(opts) do
       {:ok, pid} ->
         {:ok, pid}
