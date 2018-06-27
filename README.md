@@ -30,6 +30,7 @@ This project uses [`FileSystem`](https://github.com/falood/file_system) as a dep
 * Linux via [inotify](https://github.com/rvoicilas/inotify-tools/wiki) (installation required)
 * Windows via [inotify-win](https://github.com/thekid/inotify-win) (no installation required)
 * Mac OS X via fsevents (no installation required)
+* FreeBSD/OpenBSD/~BSD [inotify](`cd /usr/ports/sysutils/inotify-tools && make install clean`)
 
 ## Skipping remote CSS reload
 
