@@ -36,14 +36,14 @@ If this is not set, :fs_inotify will be used instead.
 
 This project uses [`FileSystem`](https://github.com/falood/file_system) as a dependency to watch your filesystem whenever there is a change and it supports the following operating systems:
 
-* Linux via [backend]
+* Linux via [`backend`]
 * Windows via [inotify-win](https://github.com/thekid/inotify-win) (no installation required)
 * Mac OS X via fsevents (no installation required)
-* FreeBSD/OpenBSD/~BSD [backend]
+* FreeBSD/OpenBSD/~BSD [`backend`]
 
-** Where the backend is one of the following available
-*** :fs_poll         ( If you don't want to use "inotify-tools")
-*** :fs_inotify      (https://github.com/rvoicilas/inotify-tools/wiki) (installation required) (This is default)
+Where the `backend` is one of the following available
+* :fs_poll         ( If you don't want to use "inotify-tools")
+* :fs_inotify      (https://github.com/rvoicilas/inotify-tools/wiki) (installation required) (This is default)
                 ~BSD (`cd /usr/ports/sysutils/inotify-tools && make install clean`)
 
 ## Skipping remote CSS reload
