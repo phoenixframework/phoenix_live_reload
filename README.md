@@ -30,7 +30,14 @@ This project uses [`FileSystem`](https://github.com/falood/file_system) as a dep
 * Linux via [inotify](https://github.com/rvoicilas/inotify-tools/wiki) (installation required)
 * Windows via [inotify-win](https://github.com/thekid/inotify-win) (no installation required)
 * Mac OS X via fsevents (no installation required)
-* FreeBSD/OpenBSD/~BSD [inotify](`cd /usr/ports/sysutils/inotify-tools && make install clean`)
+* FreeBSD/OpenBSD/~BSD via [inotify](https://github.com/rvoicilas/inotify-tools/wiki) (installation required)
+
+There is also a `:fs_poll` backend that polls the filesystem and is available on all Operating Systems in case you don't want to install any dependency. You can configure the `:backend` in your `config/config.exs`:
+
+```elixir
+config :phoenix_live_reload,
+  backend: :fs_poll
+```
 
 ## Skipping remote CSS reload
 
