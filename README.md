@@ -42,7 +42,7 @@ This project uses [`FileSystem`](https://github.com/falood/file_system) as a dep
 * FreeBSD/OpenBSD/~BSD [`backend`]
 
 Where the `backend` is one of the following available
-* :fs_poll         ( If you don't want to use "inotify-tools")
+* :fs_poll         (If you don't want to use "inotify-tools", can be used on any os)
 * :fs_inotify      (https://github.com/rvoicilas/inotify-tools/wiki) (installation required) (This is default)
   - ~BSD (`cd /usr/ports/sysutils/inotify-tools && make install clean`)
 
