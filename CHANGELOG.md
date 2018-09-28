@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.6 (2018-09-28)
+
+* Enhancements
+  * Allow file system watcher backend to be configured
+  * Add `:fs_poll` backend as fallback for generic OS support
+
 ## 1.1.5
 
 * Bug fix
