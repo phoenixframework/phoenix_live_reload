@@ -3,7 +3,7 @@ defmodule Phoenix.LiveReloader.Socket do
   The Socket handler for live reload channels.
   """
 
-  use Phoenix.Socket
+  use Phoenix.Socket, log: false
   channel "phoenix:live_reload", Phoenix.LiveReloader.Channel
 
   transport :websocket, Phoenix.Transports.WebSocket
