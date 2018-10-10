@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.7 (2018-10-10)
+
+* Enhancements
+  * Relax version requirements to support Phoenix 1.4
+
 ## 1.1.6 (2018-09-28)
 
 * Enhancements
