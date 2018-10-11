@@ -1,12 +1,12 @@
 defmodule PhoenixLiveReload.Mixfile do
   use Mix.Project
 
-  @version "1.2.0"
+  @version "1.2.0-rc.0"
 
   def project do
     [app: :phoenix_live_reload,
      version: @version,
-     elixir: "~> 1.3",
+     elixir: "~> 1.4",
      deps: deps(),
 
      # Hex
