@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0 (2018-10-11)
+
+* Enhancements
+  * Support Phoenix 1.4 transport changes
+
 ## 1.1.7 (2018-10-10)
 
 * Enhancements

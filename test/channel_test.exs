@@ -1,18 +1,43 @@
+defmodule Phoenix.LiveReloader.ChannelTest.Endpoint do
+  Application.put_env(:phoenix_live_reload, __MODULE__,
+    pubsub: [name: MyPub, adapter: Phoenix.PubSub.PG2],
+    live_reload: [
+      patterns: [
+        ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
+        ~r{priv/gettext/.*(po)$},
+        ~r{lib/live_web/views/.*(ex)$},
+        ~r{lib/live_web/templates/.*(eex)$}
+      ]
+    ]
+  )
+  use Phoenix.Endpoint, otp_app: :phoenix_live_reload
+
+  socket "/socket", Phoenix.LiveReloader.Socket, websocket: true, longpoll: true
+end
+
 defmodule Phoenix.LiveReloader.ChannelTest do
   use ExUnit.Case
   use Phoenix.ChannelTest
 
+  alias Phoenix.LiveReloader
   alias Phoenix.LiveReloader.Channel
-  @endpoint MyApp.Endpoint
+
+  @endpoint Phoenix.LiveReloader.ChannelTest.Endpoint
   @moduletag :capture_log
+
 
   defp file_event(path, event) do
     {:file_event, self(), {path, event}}
   end
 
+  setup_all do
+    {:ok, _} = @endpoint.start_link()
+    :ok
+  end
+
   setup do
     {:ok, _, socket} =
-      socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
     {:ok, socket: socket}
   end
 
@@ -40,7 +65,7 @@ defmodule Phoenix.LiveReloader.ChannelTest do
   end
 
   test "it allows project names containing _build", %{socket: socket} do
-    send socket.channel_pid, file_event("/Users/auser/www/widget_builder/web/templates/layout/app.html.eex", :created)
+    send socket.channel_pid, file_event("/Users/auser/www/widget_builder/lib/live_web/templates/layout/app.html.eex", :created)
     assert_push "assets_change", %{asset_type: "eex"}
   end
 
@@ -60,12 +85,12 @@ defmodule Phoenix.LiveReloader.ChannelTest do
   end
 
   test "sends notification for templates", %{socket: socket} do
-    send socket.channel_pid, file_event("web/templates/user/show.html.eex", :created)
+    send socket.channel_pid, file_event("lib/live_web/templates/user/show.html.eex", :created)
     assert_push "assets_change", %{asset_type: "eex"}
   end
 
   test "sends notification for views", %{socket: socket} do
-    send socket.channel_pid, file_event('a/b/c/web/views/user_view.ex', :created)
+    send socket.channel_pid, file_event('a/b/c/lib/live_web/views/user_view.ex', :created)
     assert_push "assets_change", %{asset_type: "ex"}
   end
 end
