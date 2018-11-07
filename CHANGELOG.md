@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0-rc.0 (2018-10-11)
+## 1.2.0 (2018-11-07)
 
 * Enhancements
   * Support Phoenix 1.4 transport changes
