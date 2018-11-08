@@ -11,8 +11,8 @@ defmodule Phoenix.LiveReloader.Application do
 
   def start_link do
     opts =
-      if dirs = Application.get_env(:phoenix_live_reload, :dirs) do
-        [dirs: dirs]
+      if watch_dirs = Application.get_env(:phoenix_live_reload, :watch_dirs) do
+        [dirs: watch_dirs]
       else
         [dirs: [Path.absname("")]]
       end
