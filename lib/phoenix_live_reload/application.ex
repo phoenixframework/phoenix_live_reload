@@ -10,7 +10,13 @@ defmodule Phoenix.LiveReloader.Application do
   end
 
   def start_link do
-    opts = [dirs: [Path.absname("")], name: :phoenix_live_reload_file_monitor]
+    dirs = Application.get_env(:phoenix_live_reload, :dirs, [""])
+    backend_opts = Application.get_env(:phoenix_live_reload, :backend_opts, [])
+
+    opts = [
+      name: :phoenix_live_reload_file_monitor,
+      dirs: Enum.map(dirs, &Path.absname/1),
+    ] ++ backend_opts
 
     opts =
       if backend = Application.get_env(:phoenix_live_reload, :backend) do
