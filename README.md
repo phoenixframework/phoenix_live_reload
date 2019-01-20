@@ -39,6 +39,23 @@ config :phoenix_live_reload,
   backend: :fs_poll
 ```
 
+By default the entire application directory is watched by the backend. However, with some environments and backends, this may be inefficient, resulting in slow response times to file modifications. To account for this, it's also possible to explicitly declare a list of directories for the backend to watch, and additional options for the backend:
+
+```elixir
+config :phoenix_live_reload,
+  dirs: [
+    "priv/static",
+    "priv/gettext",
+    "lib/example_web/views",
+    "lib/example_web/templates",
+  ],
+  backend: :fs_poll,
+  backend_opts: [
+    interval: 500
+  ]
+```
+
+
 ## Skipping remote CSS reload
 
 All stylesheets are reloaded without a page refresh anytime a style is detected as having changed. In certain cases such as serving stylesheets from a remote host, you may wish to prevent unnecessary reload of these stylesheets during development. For this, you can include a `data-no-reload` attribute on the link tag, ie:
