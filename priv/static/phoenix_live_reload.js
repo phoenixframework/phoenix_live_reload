@@ -41,7 +41,7 @@ var cssStrategy = function(){
 
 var pageStrategy = function(chan){
   chan.off('assets_change');
-  window.top.location.reload();
+  window.parent.location.reload();
 };
 
 var reloadStrategies = {
