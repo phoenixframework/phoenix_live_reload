@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 (2019-05-24)
+
+* Enhancements
+  * Allow custom file_system backend options
+
 ## 1.2.0 (2018-11-07)
 
 * Enhancements
