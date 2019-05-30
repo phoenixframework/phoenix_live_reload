@@ -43,6 +43,26 @@ defmodule Phoenix.LiveReloader do
         ]
       ]
 
+  In case you have an umbrella app that runs different instances of live reload on proxied paths
+  you can suffix the path to make them match properly. You can pass the `:suffix` option, ie:
+
+      config :my_app, MyApp.Endpoint,
+      ...
+      live_reload: [
+        suffix: "/proxied/app/path",
+        patterns: [
+          ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+          ~r{web/views/.*(ex)$},
+          ~r{web/templates/.*(eex)$}
+        ]
+      ]
+
+  You will also need to modify the socket path in `lib/myapp_web/endpoint.ex`:
+      if code_reloading? do
+        socket "/phoenix/live_reload/socket/proxied/app/path", Phoenix.LiveReloader.Socket
+        ...
+      end
+
   """
 
   import Plug.Conn
@@ -69,10 +89,10 @@ defmodule Phoenix.LiveReloader do
     opts
   end
 
-  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame"]} = conn , _) do
+  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame" | _suffix]} = conn , _) do
     endpoint = conn.private.phoenix_endpoint
     config = endpoint.config(:live_reload)
-    url = config[:url] || endpoint.path("/phoenix/live_reload/socket")
+    url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
     interval = config[:interval] || 100
 
     conn
@@ -102,7 +122,7 @@ defmodule Phoenix.LiveReloader do
         resp_body = IO.iodata_to_binary(conn.resp_body)
         if has_body?(resp_body) and :code.is_loaded(endpoint) do
           [page | rest] = String.split(resp_body, "</body>")
-          body = page <> reload_assets_tag(conn) <> Enum.join(["</body>" | rest], "")
+          body = page <> reload_assets_tag(conn, endpoint) <> Enum.join(["</body>" | rest], "")
           put_in conn.resp_body, body
         else
           conn
@@ -122,10 +142,12 @@ defmodule Phoenix.LiveReloader do
 
   defp has_body?(resp_body), do: String.contains?(resp_body, "<body")
 
-  defp reload_assets_tag(conn) do
-    path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame")
+  defp reload_assets_tag(conn, endpoint) do
+    path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
     """
     <iframe src="#{path}" style="display: none;"></iframe>
     """
   end
+
+  defp suffix(endpoint), do: endpoint.config(:live_reload)[:suffix] || ""
 end
