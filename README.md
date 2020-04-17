@@ -46,6 +46,7 @@ config :phoenix_live_reload,
   dirs: [
     "priv/static",
     "priv/gettext",
+    "lib/example_web/live",
     "lib/example_web/views",
     "lib/example_web/templates",
   ],
