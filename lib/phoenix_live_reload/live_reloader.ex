@@ -58,6 +58,7 @@ defmodule Phoenix.LiveReloader do
       ]
 
   You will also need to modify the socket path in `lib/myapp_web/endpoint.ex`:
+
       if code_reloading? do
         socket "/phoenix/live_reload/socket/proxied/app/path", Phoenix.LiveReloader.Socket
         ...
