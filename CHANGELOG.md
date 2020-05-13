@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2 (2020-05-13)
+
+* Enhancements
+  * Support the suffix option
+
 ## 1.2.1 (2019-05-24)
 
 * Enhancements
