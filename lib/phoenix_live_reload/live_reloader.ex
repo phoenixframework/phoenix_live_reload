@@ -126,7 +126,7 @@ defmodule Phoenix.LiveReloader do
            [leading, trailing] <- :binary.split(resp_body, "</body>")
       do
         tag = reload_assets_tag(conn, endpoint)
-        %{conn | resp_body: [leading, tag, "</body>", trailing]}
+        put_in conn.resp_body, [leading, tag, "</body>", trailing]
       else
         _ -> conn
       end
