@@ -123,7 +123,7 @@ defmodule Phoenix.LiveReloader do
            true <- html?(conn),
            true <- has_body?(resp_body),
            {:file, _} <- :code.is_loaded(endpoint),
-           [leading, trailing] <- :string.split(resp_body, "</body>")
+           [leading, trailing] <- :binary.split(resp_body, "</body>")
       do
         tag = reload_assets_tag(conn, endpoint)
         %{conn | resp_body: [leading, tag, "</body>", trailing]}
@@ -140,7 +140,7 @@ defmodule Phoenix.LiveReloader do
     end
   end
 
-  defp has_body?(resp_body), do: :string.find(resp_body, "<body") != :nomatch
+  defp has_body?(resp_body), do: String.contains?(resp_body, "<body")
 
   defp reload_assets_tag(conn, endpoint) do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
