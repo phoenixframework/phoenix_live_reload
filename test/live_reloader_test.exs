@@ -88,4 +88,15 @@ defmodule Phoenix.LiveReloaderTest do
     assert to_string(conn.resp_body) ==
       "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame/foo/bar\" style=\"display: none;\"></iframe>\n</body></html>"
   end
+
+  test "works with iolists as input" do
+    opts = Phoenix.LiveReloader.init([])
+    conn = conn("/")
+           |> put_private(:phoenix_endpoint, MyApp.EndpointSuffix)
+           |> put_resp_content_type("text/html")
+           |> Phoenix.LiveReloader.call(opts)
+           |> send_resp(200, ["<html>", '<bo', [?d, ?y | ">"], "<h1>Phoenix</h1>", "</b", ?o, 'dy>', "</html>"])
+    assert to_string(conn.resp_body) ==
+      "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame/foo/bar\" style=\"display: none;\"></iframe>\n</body></html>"
+  end
 end
