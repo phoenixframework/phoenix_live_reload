@@ -100,8 +100,8 @@ defmodule Phoenix.LiveReloader do
     |> put_resp_content_type("text/html")
     |> send_resp(200, [
       @html_before,
-      "var socket = new Phoenix.Socket(\"#{url}\");\n",
-      "var interval = #{interval};\n",
+      ~s[var socket = new Phoenix.Socket("], url, ~s[");\n],
+      "var interval = ", interval, ";\n",
       @html_after
     ])
     |> halt()
@@ -119,11 +119,11 @@ defmodule Phoenix.LiveReloader do
 
   defp before_send_inject_reloader(conn, endpoint) do
     register_before_send(conn, fn conn ->
-      if conn.resp_body != nil && html?(conn) do
+      if conn.resp_body != nil and html?(conn) do
         resp_body = IO.iodata_to_binary(conn.resp_body)
         if has_body?(resp_body) and :code.is_loaded(endpoint) do
           [page | rest] = String.split(resp_body, "</body>")
-          body = page <> reload_assets_tag(conn, endpoint) <> Enum.join(["</body>" | rest], "")
+          body = [page, reload_assets_tag(conn, endpoint), "</body>" | rest]
           put_in conn.resp_body, body
         else
           conn
@@ -145,9 +145,7 @@ defmodule Phoenix.LiveReloader do
 
   defp reload_assets_tag(conn, endpoint) do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
-    """
-    <iframe src="#{path}" style="display: none;"></iframe>
-    """
+    [~S(<iframe src="), path, ~s(" style="display: none;"></iframe>\n)]
   end
 
   defp suffix(endpoint), do: endpoint.config(:live_reload)[:suffix] || ""
