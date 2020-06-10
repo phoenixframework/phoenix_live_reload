@@ -70,11 +70,11 @@ defmodule Phoenix.LiveReloader do
   @html_before """
   <html><body>
   <script>
-    #{File.read!(phoenix_path)}
+  #{File.read!(phoenix_path)}
   """
 
   @html_after """
-    #{File.read!(reload_path)}
+  #{File.read!(reload_path)}
   </script>
   </body></html>
   """
@@ -93,8 +93,8 @@ defmodule Phoenix.LiveReloader do
     |> put_resp_content_type("text/html")
     |> send_resp(200, [
       @html_before,
-      ~s[var socket = new Phoenix.Socket("], url, ~s[");\n],
-      "var interval = ", Integer.to_string(interval), ";\n",
+      ~s[var socket = new Phoenix.Socket("#{url}");\n],
+      ~s[var interval = #{interval};\n],
       @html_after
     ])
     |> halt()
@@ -143,9 +143,9 @@ defmodule Phoenix.LiveReloader do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
 
     if class = config[:iframe_class] do
-      [~S(<iframe src="), path, ~s(" class="), class, ~S("></iframe>)]
+      ~s[<iframe src="#{path}" class="#{class}"></iframe>]
     else
-      [~S(<iframe src="), path, ~S(" style="display: none;"></iframe>)]
+      ~s[<iframe src="#{path}" style="display: none;"></iframe>]
     end
   end
 

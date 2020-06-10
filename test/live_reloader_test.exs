@@ -20,7 +20,11 @@ defmodule Phoenix.LiveReloaderTest do
 
     assert conn.status == 200
     assert to_string(conn.resp_body) =~
-           ~s[Phoenix.Socket]
+           ~s[var socket = new Phoenix.Socket("ws://localhost:4000");\n]
+
+    assert to_string(conn.resp_body) =~
+           ~s[var interval = 100;\n]
+
     refute to_string(conn.resp_body) =~
            ~s[<iframe]
 
