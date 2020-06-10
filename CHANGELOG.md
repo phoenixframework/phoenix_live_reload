@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.3 (2020-06-10)
+
+* Enhancements
+  * Support the iframe_class option for live reload
+
 ## 1.2.2 (2020-05-13)
 
 * Enhancements
