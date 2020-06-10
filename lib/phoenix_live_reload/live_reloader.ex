@@ -94,7 +94,7 @@ defmodule Phoenix.LiveReloader do
     |> send_resp(200, [
       @html_before,
       ~s[var socket = new Phoenix.Socket("], url, ~s[");\n],
-      "var interval = ", interval, ";\n",
+      "var interval = ", Integer.to_string(interval), ";\n",
       @html_after
     ])
     |> halt()
