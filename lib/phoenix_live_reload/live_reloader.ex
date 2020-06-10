@@ -15,54 +15,47 @@ defmodule Phoenix.LiveReloader do
 
   ## Configuration
 
-  For live-reloading in development, add the following `:live_reload`
-  configuration to your Endpoint with a list of patterns to watch for changes:
+  All live-reloading configuration must be done inside the `:live_reload`
+  key of your endpoint, such as this:
 
       config :my_app, MyApp.Endpoint,
-      ...
-      live_reload: [
-        patterns: [
-          ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
-          ~r{web/views/.*(ex)$},
-          ~r{web/templates/.*(eex)$}
-        ]
-      ]
-
-
-  By default the URL of the live-reload connection will use the browser's
-  host and port. To override this, you can pass the `:url` option, ie:
-
-      config :my_app, MyApp.Endpoint,
-      ...
-      live_reload: [
-        url: "ws://localhost:4000",
-        patterns: [
-          ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
-          ~r{web/views/.*(ex)$},
-          ~r{web/templates/.*(eex)$}
-        ]
-      ]
-
-  In case you have an umbrella app that runs different instances of live reload on proxied paths
-  you can suffix the path to make them match properly. You can pass the `:suffix` option, ie:
-
-      config :my_app, MyApp.Endpoint,
-      ...
-      live_reload: [
-        suffix: "/proxied/app/path",
-        patterns: [
-          ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
-          ~r{web/views/.*(ex)$},
-          ~r{web/templates/.*(eex)$}
-        ]
-      ]
-
-  You will also need to modify the socket path in `lib/myapp_web/endpoint.ex`:
-
-      if code_reloading? do
-        socket "/phoenix/live_reload/socket/proxied/app/path", Phoenix.LiveReloader.Socket
         ...
-      end
+        live_reload: [
+          patterns: [
+            ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+            ~r{lib/my_app_web/views/.*(ex)$},
+            ~r{lib/my_app_web/templates/.*(eex)$}
+          ]
+        ]
+
+  The following options are supported:
+
+    * `:patterns` - a list of patterns to trigger the live reloading.
+      This option is required to enable any live reloading.
+
+    * `:iframe_class` - a class to be used to be given to the iframe
+      injected by live reload. By default the iframe uses a "style"
+      attribute to hide itself but that can conflict with Content
+      Security Policies. By giving a class, you disable the default
+      style and control the styling of the iframe.
+
+    * `:url` - the URL of the live reload socket connection. By default
+      it will use the browser's host and port.
+
+    * `:suffix` - if you are running live-reloading on an umbrella app,
+      you may want to give a different suffix to each socket connection.
+      You can do so with the `:suffix` option:
+
+          live_reload: [
+            suffix: "/proxied/app/path"
+          ]
+
+      And then configure the endpoint to use the same suffix:
+
+          if code_reloading? do
+            socket "/phoenix/live_reload/socket/proxied/app/path", Phoenix.LiveReloader.Socket
+            ...
+          end
 
   """
 
@@ -74,7 +67,7 @@ defmodule Phoenix.LiveReloader do
   @external_resource phoenix_path
   @external_resource reload_path
 
-  @html_before  """
+  @html_before """
   <html><body>
   <script>
     #{File.read!(phoenix_path)}
@@ -90,7 +83,7 @@ defmodule Phoenix.LiveReloader do
     opts
   end
 
-  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame" | _suffix]} = conn , _) do
+  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame" | _suffix]} = conn, _) do
     endpoint = conn.private.phoenix_endpoint
     config = endpoint.config(:live_reload)
     url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
@@ -109,21 +102,24 @@ defmodule Phoenix.LiveReloader do
 
   def call(conn, _) do
     endpoint = conn.private.phoenix_endpoint
-    patterns = get_in endpoint.config(:live_reload), [:patterns]
+    config = endpoint.config(:live_reload)
+    patterns = config[:patterns]
+
     if patterns && patterns != [] do
-      before_send_inject_reloader(conn, endpoint)
+      before_send_inject_reloader(conn, endpoint, config)
     else
       conn
     end
   end
 
-  defp before_send_inject_reloader(conn, endpoint) do
+  defp before_send_inject_reloader(conn, endpoint, config) do
     register_before_send(conn, fn conn ->
       if conn.resp_body != nil and html?(conn) do
         resp_body = IO.iodata_to_binary(conn.resp_body)
+
         if has_body?(resp_body) and :code.is_loaded(endpoint) do
           [page | rest] = String.split(resp_body, "</body>")
-          body = [page, reload_assets_tag(conn, endpoint), "</body>" | rest]
+          body = [page, reload_assets_tag(conn, endpoint, config), "</body>" | rest]
           put_in conn.resp_body, body
         else
           conn
@@ -143,9 +139,14 @@ defmodule Phoenix.LiveReloader do
 
   defp has_body?(resp_body), do: String.contains?(resp_body, "<body")
 
-  defp reload_assets_tag(conn, endpoint) do
+  defp reload_assets_tag(conn, endpoint, config) do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
-    [~S(<iframe src="), path, ~s(" style="display: none;"></iframe>\n)]
+
+    if class = config[:iframe_class] do
+      [~S(<iframe src="), path, ~s(" class="), class, ~S("></iframe>)]
+    else
+      [~S(<iframe src="), path, ~S(" style="display: none;"></iframe>)]
+    end
   end
 
   defp suffix(endpoint), do: endpoint.config(:live_reload)[:suffix] || ""

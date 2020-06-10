@@ -33,7 +33,7 @@ defmodule Phoenix.LiveReloaderTest do
            |> Phoenix.LiveReloader.call(opts)
            |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
     assert to_string(conn.resp_body) ==
-      "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" style=\"display: none;\"></iframe>\n</body></html>"
+      "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" style=\"display: none;\"></iframe></body></html>"
   end
 
   test "injects live_reload with script_name" do
@@ -44,9 +44,8 @@ defmodule Phoenix.LiveReloaderTest do
            |> Phoenix.LiveReloader.call(opts)
            |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
     assert to_string(conn.resp_body) ==
-      "<html><body><h1>Phoenix</h1><iframe src=\"/foo/bar/phoenix/live_reload/frame\" style=\"display: none;\"></iframe>\n</body></html>"
+      "<html><body><h1>Phoenix</h1><iframe src=\"/foo/bar/phoenix/live_reload/frame\" style=\"display: none;\"></iframe></body></html>"
   end
-
 
   test "skips live_reload injection if html response missing body tag" do
     opts = Phoenix.LiveReloader.init([])
@@ -78,15 +77,15 @@ defmodule Phoenix.LiveReloaderTest do
            ~s(<iframe src="/phoenix/live_reload/frame")
   end
 
-  test "injects scoped live_reload for html requests if configured and contains <body> tag" do
+  test "injects scoped live_reload with iframe class if configured" do
     opts = Phoenix.LiveReloader.init([])
     conn = conn("/")
-           |> put_private(:phoenix_endpoint, MyApp.EndpointSuffix)
+           |> put_private(:phoenix_endpoint, MyApp.EndpointConfig)
            |> put_resp_content_type("text/html")
            |> Phoenix.LiveReloader.call(opts)
            |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
     assert to_string(conn.resp_body) ==
-      "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame/foo/bar\" style=\"display: none;\"></iframe>\n</body></html>"
+      "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame/foo/bar\" class=\"d-none\"></iframe></body></html>"
   end
 
   test "works with iolists as input" do

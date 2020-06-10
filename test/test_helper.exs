@@ -16,10 +16,11 @@ Application.put_env(:phoenix_live_reload, MyApp.EndpointScript, [
   url: [path: "/foo/bar"],
 ])
 
-Application.put_env(:phoenix_live_reload, MyApp.EndpointSuffix,
+Application.put_env(:phoenix_live_reload, MyApp.EndpointConfig,
   live_reload:
     [url: "ws://localhost:4000",
      suffix: "/foo/bar",
+     iframe_class: "d-none",
      patterns: [
        ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
        ~r{web/views/.*(ex)$},
@@ -32,11 +33,11 @@ end
 defmodule MyApp.EndpointScript do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 end
-defmodule MyApp.EndpointSuffix do
+defmodule MyApp.EndpointConfig do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 end
 
 MyApp.Endpoint.start_link()
 MyApp.EndpointScript.start_link()
-MyApp.EndpointSuffix.start_link()
+MyApp.EndpointConfig.start_link()
 ExUnit.start()
