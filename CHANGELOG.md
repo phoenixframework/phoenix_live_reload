@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.4 (2020-06-10)
+
+* Bug fixes
+  * Fix a bug related to improper live reload interval
+
 ## 1.2.3 (2020-06-10)
 
 * Enhancements
