@@ -34,10 +34,7 @@ defmodule Phoenix.LiveReloader do
       This option is required to enable any live reloading.
 
     * `:iframe_class` - a class to be used to be given to the iframe
-      injected by live reload. By default the iframe uses a "style"
-      attribute to hide itself but that can conflict with Content
-      Security Policies. By giving a class, you disable the default
-      style and control the styling of the iframe.
+      injected by live reload.
 
     * `:url` - the URL of the live reload socket connection. By default
       it will use the browser's host and port.
@@ -143,9 +140,9 @@ defmodule Phoenix.LiveReloader do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
 
     if class = config[:iframe_class] do
-      ~s[<iframe src="#{path}" class="#{class}"></iframe>]
+      ~s[<iframe src="#{path}" hidden class="#{class}"></iframe>]
     else
-      ~s[<iframe src="#{path}" style="display: none;"></iframe>]
+      ~s[<iframe src="#{path}" hidden></iframe>]
     end
   end
 
