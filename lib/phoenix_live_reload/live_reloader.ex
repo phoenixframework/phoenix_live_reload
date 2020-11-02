@@ -36,6 +36,9 @@ defmodule Phoenix.LiveReloader do
     * `:iframe_class` - a class to be used to be given to the iframe
       injected by live reload.
 
+    * `:iframe_attrs` - attrs to be given to the iframe injected by
+      live reload.
+
     * `:url` - the URL of the live reload socket connection. By default
       it will use the browser's host and port.
 
@@ -139,11 +142,20 @@ defmodule Phoenix.LiveReloader do
   defp reload_assets_tag(conn, endpoint, config) do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
 
-    if class = config[:iframe_class] do
-      ~s[<iframe src="#{path}" hidden class="#{class}"></iframe>]
+    iframe_attrs = config
+    |> Keyword.get(:iframe_attrs, [])
+    |> Keyword.put_new(:src, path)
+    |> Keyword.put_new(:hidden, true)
+
+    iframe_attrs = if Keyword.has_key?(config, :iframe_class) do
+      Keyword.put_new(iframe_attrs, :class, config[:iframe_class])
     else
-      ~s[<iframe src="#{path}" hidden></iframe>]
+      iframe_attrs
     end
+
+    :iframe
+    |> Phoenix.HTML.Tag.content_tag(nil, iframe_attrs)
+    |> Phoenix.HTML.safe_to_string()
   end
 
   defp suffix(endpoint), do: endpoint.config(:live_reload)[:suffix] || ""
