@@ -34,7 +34,7 @@ defmodule Phoenix.LiveReloader do
       This option is required to enable any live reloading.
 
     * `:iframe_attrs` - attrs to be given to the iframe injected by
-      live reload.
+      live reload. Expects a keyword list of atom keys and string values.
 
     * `:url` - the URL of the live reload socket connection. By default
       it will use the browser's host and port.
@@ -139,22 +139,47 @@ defmodule Phoenix.LiveReloader do
   defp reload_assets_tag(conn, endpoint, config) do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
 
-    iframe_attrs =
+    attrs =
       config
       |> Keyword.get(:iframe_attrs, [])
       |> Keyword.put_new(:src, path)
       |> Keyword.put_new(:hidden, true)
 
-    iframe_attrs =
+    attrs =
       if Keyword.has_key?(config, :iframe_class) do
-        Keyword.put_new(iframe_attrs, :class, config[:iframe_class])
+        IO.warn(
+          "The :iframe_class for Phoenix LiveReloader is deprecated, " <>
+            "please remove it or use :iframe_attrs instead"
+        )
+
+        Keyword.put_new(attrs, :class, config[:iframe_class])
       else
-        iframe_attrs
+        attrs
       end
 
-    :iframe
-    |> Phoenix.HTML.Tag.content_tag(nil, iframe_attrs)
-    |> Phoenix.HTML.safe_to_string()
+    IO.iodata_to_binary(["<iframe", attrs(attrs), "></iframe>"])
+  end
+
+  defp attrs(attrs) do
+    Enum.map(attrs, fn
+      {_key, nil} -> []
+      {_key, false} -> []
+      {key, true} -> [?\s, key(key)]
+      {key, value} -> [?\s, key(key), ?=, ?", value(value), ?"]
+    end)
+  end
+
+  defp key(key) do
+    key
+    |> to_string()
+    |> String.replace("_", "-")
+    |> Plug.HTML.html_escape_to_iodata()
+  end
+
+  defp value(value) do
+    value
+    |> to_string()
+    |> Plug.HTML.html_escape_to_iodata()
   end
 
   defp suffix(endpoint), do: endpoint.config(:live_reload)[:suffix] || ""

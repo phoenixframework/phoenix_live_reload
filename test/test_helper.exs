@@ -1,5 +1,5 @@
 Application.put_env(:phoenix_live_reload, MyApp.Endpoint,
-  pubsub: [adapter: Phoenix.PubSub.PG2, name: Phoenix.LiveReloader.PubSub],
+  pubsub_server: MyApp.PubSub,
   live_reload: [
     url: "ws://localhost:4000",
     patterns: [
@@ -22,7 +22,7 @@ Application.put_env(:phoenix_live_reload, MyApp.EndpointConfig,
   live_reload: [
     url: "ws://localhost:4000",
     suffix: "/foo/bar",
-    iframe_class: "d-none",
+    iframe_attrs: [class: "foo", data_attr: "bar"],
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
       ~r{web/views/.*(ex)$},
@@ -33,6 +33,8 @@ Application.put_env(:phoenix_live_reload, MyApp.EndpointConfig,
 
 defmodule MyApp.Endpoint do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
+
+  socket "/socket", Phoenix.LiveReloader.Socket, websocket: true, longpoll: true
 end
 
 defmodule MyApp.EndpointScript do
@@ -43,7 +45,13 @@ defmodule MyApp.EndpointConfig do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 end
 
-MyApp.Endpoint.start_link()
-MyApp.EndpointScript.start_link()
-MyApp.EndpointConfig.start_link()
+children = [
+  {Phoenix.PubSub, name: MyApp.PubSub, adapter: Phoenix.PubSub.PG2},
+  MyApp.Endpoint,
+  MyApp.EndpointScript,
+  MyApp.EndpointConfig,
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+
 ExUnit.start()

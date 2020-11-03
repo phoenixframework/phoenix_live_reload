@@ -41,7 +41,7 @@ defmodule Phoenix.LiveReloaderTest do
       |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
 
     assert to_string(conn.resp_body) ==
-             "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" hidden></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe hidden src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
   end
 
   test "injects live_reload with script_name" do
@@ -55,7 +55,7 @@ defmodule Phoenix.LiveReloaderTest do
       |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
 
     assert to_string(conn.resp_body) ==
-             "<html><body><h1>Phoenix</h1><iframe src=\"/foo/bar/phoenix/live_reload/frame\" hidden></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe hidden src=\"/foo/bar/phoenix/live_reload/frame\"></iframe></body></html>"
   end
 
   test "skips live_reload injection if html response missing body tag" do
@@ -98,7 +98,7 @@ defmodule Phoenix.LiveReloaderTest do
              ~s(<iframe src="/phoenix/live_reload/frame")
   end
 
-  test "injects scoped live_reload with iframe class if configured" do
+  test "injects scoped live_reload with iframe attrs if configured" do
     opts = Phoenix.LiveReloader.init([])
 
     conn =
@@ -109,7 +109,7 @@ defmodule Phoenix.LiveReloaderTest do
       |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
 
     assert to_string(conn.resp_body) ==
-             "<html><body><h1>Phoenix</h1><iframe class=\"d-none\" src=\"/phoenix/live_reload/frame/foo/bar\" hidden></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe hidden src=\"/phoenix/live_reload/frame/foo/bar\" class=\"foo\" data-attr=\"bar\"></iframe></body></html>"
   end
 
   test "works with iolists as input" do
@@ -132,6 +132,6 @@ defmodule Phoenix.LiveReloaderTest do
       ])
 
     assert to_string(conn.resp_body) ==
-             "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" hidden></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe hidden src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
   end
 end

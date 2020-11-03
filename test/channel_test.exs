@@ -1,38 +1,15 @@
-defmodule Phoenix.LiveReloader.ChannelTest.Endpoint do
-  Application.put_env(:phoenix_live_reload, __MODULE__,
-    pubsub: [name: MyPub, adapter: Phoenix.PubSub.PG2],
-    live_reload: [
-      patterns: [
-        ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-        ~r{priv/gettext/.*(po)$},
-        ~r{lib/live_web/views/.*(ex)$},
-        ~r{lib/live_web/templates/.*(eex)$}
-      ]
-    ]
-  )
-
-  use Phoenix.Endpoint, otp_app: :phoenix_live_reload
-
-  socket "/socket", Phoenix.LiveReloader.Socket, websocket: true, longpoll: true
-end
-
 defmodule Phoenix.LiveReloader.ChannelTest do
   use ExUnit.Case
-  use Phoenix.ChannelTest
+  import Phoenix.ChannelTest
 
   alias Phoenix.LiveReloader
   alias Phoenix.LiveReloader.Channel
 
-  @endpoint Phoenix.LiveReloader.ChannelTest.Endpoint
+  @endpoint MyApp.Endpoint
   @moduletag :capture_log
 
   defp file_event(path, event) do
     {:file_event, self(), {path, event}}
-  end
-
-  setup_all do
-    {:ok, _} = @endpoint.start_link()
-    :ok
   end
 
   setup do
