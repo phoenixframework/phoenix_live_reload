@@ -89,7 +89,7 @@ defmodule Phoenix.LiveReloaderTest do
            |> Phoenix.LiveReloader.call(opts)
            |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
     assert to_string(conn.resp_body) ==
-      "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame/foo/bar\" hidden class=\"d-none\"></iframe></body></html>"
+      "<html><body><h1>Phoenix</h1><iframe class=\"d-none\" src=\"/phoenix/live_reload/frame/foo/bar\" hidden></iframe></body></html>"
   end
 
   test "works with iolists as input" do
