@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.0 (2020-11-03)
+
+This release requires Elixir v1.6+.
+
+* Enhancements
+  * Use `hidden` attribute instead of `style="display: none"`
+  * Fix warnings on Elixir v1.11
+
+* Deprecations
+  * `:iframe_class` is deprecated in favor of `:iframe_attrs`
+
 ## 1.2.4 (2020-06-10)
 
 * Bug fixes

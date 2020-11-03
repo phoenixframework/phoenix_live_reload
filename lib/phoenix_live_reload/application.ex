@@ -1,11 +1,9 @@
 defmodule Phoenix.LiveReloader.Application do
   use Application
-
   require Logger
 
   def start(_type, _args) do
-    import Supervisor.Spec
-    children = [worker(__MODULE__, [])]
+    children = [%{id: __MODULE__, start: {__MODULE__, :start_link, []}}]
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 
