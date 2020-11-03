@@ -13,10 +13,11 @@ defmodule Phoenix.LiveReloader.Application do
     dirs = Application.get_env(:phoenix_live_reload, :dirs, [""])
     backend_opts = Application.get_env(:phoenix_live_reload, :backend_opts, [])
 
-    opts = [
-      name: :phoenix_live_reload_file_monitor,
-      dirs: Enum.map(dirs, &Path.absname/1),
-    ] ++ backend_opts
+    opts =
+      [
+        name: :phoenix_live_reload_file_monitor,
+        dirs: Enum.map(dirs, &Path.absname/1)
+      ] ++ backend_opts
 
     opts =
       if backend = Application.get_env(:phoenix_live_reload, :backend) do
@@ -30,11 +31,12 @@ defmodule Phoenix.LiveReloader.Application do
         {:ok, pid}
 
       other ->
-        Logger.warn """
+        Logger.warn("""
         Could not start Phoenix live-reload because we cannot listen to the file system.
         You don't need to worry! This is an optional feature used during development to
         refresh your browser when you save files and it does not affect production.
-        """
+        """)
+
         other
     end
   end

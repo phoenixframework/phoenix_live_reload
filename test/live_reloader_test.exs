@@ -15,91 +15,123 @@ defmodule Phoenix.LiveReloaderTest do
   end
 
   test "renders frame with phoenix.js" do
-    conn = conn("/phoenix/live_reload/frame")
-           |> Phoenix.LiveReloader.call([])
+    conn =
+      conn("/phoenix/live_reload/frame")
+      |> Phoenix.LiveReloader.call([])
 
     assert conn.status == 200
-    assert to_string(conn.resp_body) =~
-           ~s[var socket = new Phoenix.Socket("ws://localhost:4000");\n]
 
     assert to_string(conn.resp_body) =~
-           ~s[var interval = 100;\n]
+             ~s[var socket = new Phoenix.Socket("ws://localhost:4000");\n]
+
+    assert to_string(conn.resp_body) =~
+             ~s[var interval = 100;\n]
 
     refute to_string(conn.resp_body) =~
-           ~s[<iframe]
-
+             ~s[<iframe]
   end
 
   test "injects live_reload for html requests if configured and contains <body> tag" do
     opts = Phoenix.LiveReloader.init([])
-    conn = conn("/")
-           |> put_resp_content_type("text/html")
-           |> Phoenix.LiveReloader.call(opts)
-           |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
+
+    conn =
+      conn("/")
+      |> put_resp_content_type("text/html")
+      |> Phoenix.LiveReloader.call(opts)
+      |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
+
     assert to_string(conn.resp_body) ==
-      "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" hidden></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" hidden></iframe></body></html>"
   end
 
   test "injects live_reload with script_name" do
     opts = Phoenix.LiveReloader.init([])
-    conn = conn("/")
-           |> put_private(:phoenix_endpoint, MyApp.EndpointScript)
-           |> put_resp_content_type("text/html")
-           |> Phoenix.LiveReloader.call(opts)
-           |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
+
+    conn =
+      conn("/")
+      |> put_private(:phoenix_endpoint, MyApp.EndpointScript)
+      |> put_resp_content_type("text/html")
+      |> Phoenix.LiveReloader.call(opts)
+      |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
+
     assert to_string(conn.resp_body) ==
-      "<html><body><h1>Phoenix</h1><iframe src=\"/foo/bar/phoenix/live_reload/frame\" hidden></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe src=\"/foo/bar/phoenix/live_reload/frame\" hidden></iframe></body></html>"
   end
 
   test "skips live_reload injection if html response missing body tag" do
     opts = Phoenix.LiveReloader.init([])
-    conn = conn("/")
-           |> put_resp_content_type("text/html")
-           |> Phoenix.LiveReloader.call(opts)
-           |> send_resp(200, "<h1>Phoenix</h1>")
+
+    conn =
+      conn("/")
+      |> put_resp_content_type("text/html")
+      |> Phoenix.LiveReloader.call(opts)
+      |> send_resp(200, "<h1>Phoenix</h1>")
+
     assert to_string(conn.resp_body) == "<h1>Phoenix</h1>"
   end
 
   test "skips live_reload if not html request" do
     opts = Phoenix.LiveReloader.init([])
-    conn = conn("/")
-           |> put_resp_content_type("application/json")
-           |> Phoenix.LiveReloader.call(opts)
-           |> send_resp(200, "")
+
+    conn =
+      conn("/")
+      |> put_resp_content_type("application/json")
+      |> Phoenix.LiveReloader.call(opts)
+      |> send_resp(200, "")
+
     refute to_string(conn.resp_body) =~
-           ~s(<iframe src="/phoenix/live_reload/frame")
+             ~s(<iframe src="/phoenix/live_reload/frame")
   end
 
   test "skips live_reload if body is nil" do
     opts = Phoenix.LiveReloader.init([])
-    conn = conn("/")
-           |> put_resp_content_type("text/html")
-           |> Phoenix.LiveReloader.call(opts)
-           |> send_file(200, Path.join(File.cwd!, "README.md"))
+
+    conn =
+      conn("/")
+      |> put_resp_content_type("text/html")
+      |> Phoenix.LiveReloader.call(opts)
+      |> send_file(200, Path.join(File.cwd!(), "README.md"))
+
     assert conn.status == 200
+
     refute to_string(conn.resp_body) =~
-           ~s(<iframe src="/phoenix/live_reload/frame")
+             ~s(<iframe src="/phoenix/live_reload/frame")
   end
 
   test "injects scoped live_reload with iframe class if configured" do
     opts = Phoenix.LiveReloader.init([])
-    conn = conn("/")
-           |> put_private(:phoenix_endpoint, MyApp.EndpointConfig)
-           |> put_resp_content_type("text/html")
-           |> Phoenix.LiveReloader.call(opts)
-           |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
+
+    conn =
+      conn("/")
+      |> put_private(:phoenix_endpoint, MyApp.EndpointConfig)
+      |> put_resp_content_type("text/html")
+      |> Phoenix.LiveReloader.call(opts)
+      |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
+
     assert to_string(conn.resp_body) ==
-      "<html><body><h1>Phoenix</h1><iframe class=\"d-none\" src=\"/phoenix/live_reload/frame/foo/bar\" hidden></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe class=\"d-none\" src=\"/phoenix/live_reload/frame/foo/bar\" hidden></iframe></body></html>"
   end
 
   test "works with iolists as input" do
     opts = Phoenix.LiveReloader.init([])
-    conn = conn("/")
-           |> put_private(:phoenix_endpoint, MyApp.Endpoint)
-           |> put_resp_content_type("text/html")
-           |> Phoenix.LiveReloader.call(opts)
-           |> send_resp(200, ["<html>", '<bo', [?d, ?y | ">"], "<h1>Phoenix</h1>", "</b", ?o, 'dy>', "</html>"])
+
+    conn =
+      conn("/")
+      |> put_private(:phoenix_endpoint, MyApp.Endpoint)
+      |> put_resp_content_type("text/html")
+      |> Phoenix.LiveReloader.call(opts)
+      |> send_resp(200, [
+        "<html>",
+        '<bo',
+        [?d, ?y | ">"],
+        "<h1>Phoenix</h1>",
+        "</b",
+        ?o,
+        'dy>',
+        "</html>"
+      ])
+
     assert to_string(conn.resp_body) ==
-      "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" hidden></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe src=\"/phoenix/live_reload/frame\" hidden></iframe></body></html>"
   end
 end

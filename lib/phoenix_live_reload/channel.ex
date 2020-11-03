@@ -20,8 +20,8 @@ defmodule Phoenix.LiveReloader.Channel do
   def handle_info({:file_event, _pid, {path, _event}}, socket) do
     if matches_any_pattern?(path, socket.assigns[:patterns]) do
       asset_type = remove_leading_dot(Path.extname(path))
-      Logger.debug "Live reload: #{Path.relative_to_cwd(path)}"
-      push socket, "assets_change", %{asset_type: asset_type}
+      Logger.debug("Live reload: #{Path.relative_to_cwd(path)}")
+      push(socket, "assets_change", %{asset_type: asset_type})
     end
 
     {:noreply, socket}

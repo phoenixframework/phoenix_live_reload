@@ -117,7 +117,7 @@ defmodule Phoenix.LiveReloader do
         if has_body?(resp_body) and :code.is_loaded(endpoint) do
           [page | rest] = String.split(resp_body, "</body>")
           body = [page, reload_assets_tag(conn, endpoint, config), "</body>" | rest]
-          put_in conn.resp_body, body
+          put_in(conn.resp_body, body)
         else
           conn
         end
@@ -139,16 +139,18 @@ defmodule Phoenix.LiveReloader do
   defp reload_assets_tag(conn, endpoint, config) do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
 
-    iframe_attrs = config
-    |> Keyword.get(:iframe_attrs, [])
-    |> Keyword.put_new(:src, path)
-    |> Keyword.put_new(:hidden, true)
+    iframe_attrs =
+      config
+      |> Keyword.get(:iframe_attrs, [])
+      |> Keyword.put_new(:src, path)
+      |> Keyword.put_new(:hidden, true)
 
-    iframe_attrs = if Keyword.has_key?(config, :iframe_class) do
-      Keyword.put_new(iframe_attrs, :class, config[:iframe_class])
-    else
-      iframe_attrs
-    end
+    iframe_attrs =
+      if Keyword.has_key?(config, :iframe_class) do
+        Keyword.put_new(iframe_attrs, :class, config[:iframe_class])
+      else
+        iframe_attrs
+      end
 
     :iframe
     |> Phoenix.HTML.Tag.content_tag(nil, iframe_attrs)
