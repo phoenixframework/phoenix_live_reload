@@ -140,10 +140,10 @@ defmodule Phoenix.LiveReloader do
     path = conn.private.phoenix_endpoint.path("/phoenix/live_reload/frame#{suffix(endpoint)}")
 
     attrs =
-      config
-      |> Keyword.get(:iframe_attrs, [])
-      |> Keyword.put_new(:src, path)
-      |> Keyword.put_new(:hidden, true)
+      Keyword.merge(
+        [hidden: true, height: 0, width: 0, src: path],
+        Keyword.get(config, :iframe_attrs, [])
+      )
 
     attrs =
       if Keyword.has_key?(config, :iframe_class) do

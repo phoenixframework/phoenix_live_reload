@@ -41,7 +41,7 @@ defmodule Phoenix.LiveReloaderTest do
       |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
 
     assert to_string(conn.resp_body) ==
-             "<html><body><h1>Phoenix</h1><iframe hidden src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe hidden height=\"0\" width=\"0\" src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
   end
 
   test "injects live_reload with script_name" do
@@ -55,7 +55,7 @@ defmodule Phoenix.LiveReloaderTest do
       |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
 
     assert to_string(conn.resp_body) ==
-             "<html><body><h1>Phoenix</h1><iframe hidden src=\"/foo/bar/phoenix/live_reload/frame\"></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe hidden height=\"0\" width=\"0\" src=\"/foo/bar/phoenix/live_reload/frame\"></iframe></body></html>"
   end
 
   test "skips live_reload injection if html response missing body tag" do
@@ -109,7 +109,7 @@ defmodule Phoenix.LiveReloaderTest do
       |> send_resp(200, "<html><body><h1>Phoenix</h1></body></html>")
 
     assert to_string(conn.resp_body) ==
-             "<html><body><h1>Phoenix</h1><iframe hidden src=\"/phoenix/live_reload/frame/foo/bar\" class=\"foo\" data-attr=\"bar\"></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe hidden height=\"0\" width=\"0\" src=\"/phoenix/live_reload/frame/foo/bar\" class=\"foo\" data-attr=\"bar\"></iframe></body></html>"
   end
 
   test "works with iolists as input" do
@@ -132,6 +132,6 @@ defmodule Phoenix.LiveReloaderTest do
       ])
 
     assert to_string(conn.resp_body) ==
-             "<html><body><h1>Phoenix</h1><iframe hidden src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
+             "<html><body><h1>Phoenix</h1><iframe hidden height=\"0\" width=\"0\" src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
   end
 end
