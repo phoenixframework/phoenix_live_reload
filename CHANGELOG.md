@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.1 (2021-04-12)
+
+* Bug fixes
+  * Use width=0 and height=0 on iframe
+
 ## 1.3.0 (2020-11-03)
 
 This release requires Elixir v1.6+.
