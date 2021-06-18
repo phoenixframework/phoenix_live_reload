@@ -36,6 +36,10 @@ defmodule Phoenix.LiveReloader do
     * `:iframe_attrs` - attrs to be given to the iframe injected by
       live reload. Expects a keyword list of atom keys and string values.
 
+    * `:target_window` - the window that will be reloaded, as an atom.
+      Valid values are `:top` and `:parent`. An invalid value will
+      default to `:top`.
+
     * `:url` - the URL of the live reload socket connection. By default
       it will use the browser's host and port.
 
