@@ -27,6 +27,9 @@ defmodule Phoenix.LiveReloaderTest do
     assert to_string(conn.resp_body) =~
              ~s[var interval = 100;\n]
 
+    assert to_string(conn.resp_body) =~
+             ~s[var targetWindow = "top";\n]
+
     refute to_string(conn.resp_body) =~
              ~s[<iframe]
   end
@@ -134,4 +137,25 @@ defmodule Phoenix.LiveReloaderTest do
     assert to_string(conn.resp_body) ==
              "<html><body><h1>Phoenix</h1><iframe hidden height=\"0\" width=\"0\" src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
   end
+
+  test "window target can be set to parent" do
+    conn =
+      conn("/phoenix/live_reload/frame")
+      |> put_private(:phoenix_endpoint, MyApp.EndpointParentWindow)
+      |> Phoenix.LiveReloader.call([])
+
+    assert to_string(conn.resp_body) =~
+      ~s[var targetWindow = "parent";\n]
+  end
+
+  test "wrong window target defaults to top" do
+    conn =
+      conn("/phoenix/live_reload/frame")
+      |> put_private(:phoenix_endpoint, MyApp.EndpointWrongWindow)
+      |> Phoenix.LiveReloader.call([])
+
+    assert to_string(conn.resp_body) =~
+      ~s[var targetWindow = "top";\n]
+  end
+
 end

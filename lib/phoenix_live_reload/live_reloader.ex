@@ -36,6 +36,10 @@ defmodule Phoenix.LiveReloader do
     * `:iframe_attrs` - attrs to be given to the iframe injected by
       live reload. Expects a keyword list of atom keys and string values.
 
+    * `:target_window` - the window that will be reloaded, as an atom.
+      Valid values are `:top` and `:parent`. An invalid value will
+      default to `:top`.
+
     * `:url` - the URL of the live reload socket connection. By default
       it will use the browser's host and port.
 
@@ -85,6 +89,7 @@ defmodule Phoenix.LiveReloader do
     config = endpoint.config(:live_reload)
     url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
     interval = config[:interval] || 100
+    target_window = get_target_window(config[:target_window])
 
     conn
     |> put_resp_content_type("text/html")
@@ -92,6 +97,7 @@ defmodule Phoenix.LiveReloader do
       @html_before,
       ~s[var socket = new Phoenix.Socket("#{url}");\n],
       ~s[var interval = #{interval};\n],
+      ~s[var targetWindow = "#{target_window}";\n],
       @html_after
     ])
     |> halt()
@@ -183,4 +189,9 @@ defmodule Phoenix.LiveReloader do
   end
 
   defp suffix(endpoint), do: endpoint.config(:live_reload)[:suffix] || ""
+
+  defp get_target_window(:parent), do: "parent"
+
+  defp get_target_window(_), do: "top"
+
 end
