@@ -71,7 +71,7 @@ defmodule Phoenix.LiveReloader do
   @html_before """
   <html><body>
   <script>
-  #{File.read!(phoenix_path)}
+  #{File.read!(phoenix_path) |> String.replace("//# sourceMappingURL=", "// ")}
   """
 
   @html_after """
