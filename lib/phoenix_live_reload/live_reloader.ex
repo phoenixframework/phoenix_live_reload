@@ -63,22 +63,7 @@ defmodule Phoenix.LiveReloader do
   import Plug.Conn
   @behaviour Plug
 
-  phoenix_path = Application.app_dir(:phoenix, "priv/static/phoenix.js")
-  reload_path = Application.app_dir(:phoenix_live_reload, "priv/static/phoenix_live_reload.js")
-  @external_resource phoenix_path
-  @external_resource reload_path
-
-  @html_before """
-  <html><body>
-  <script>
-  #{File.read!(phoenix_path) |> String.replace("//# sourceMappingURL=", "// ")}
-  """
-
-  @html_after """
-  #{File.read!(reload_path)}
-  </script>
-  </body></html>
-  """
+  require Phoenix.LiveReloader.Frame, as: Frame
 
   def init(opts) do
     opts
@@ -93,12 +78,18 @@ defmodule Phoenix.LiveReloader do
 
     conn
     |> put_resp_content_type("text/html")
+    |> send_resp(200, Frame.content(url, interval, target_window))
+    |> halt()
+  end
+
+  def call(
+        %Plug.Conn{path_info: ["phoenix", "live_reload", "js", "phoenix.js"]} = conn,
+        _
+      ) do
+    conn
+    |> put_resp_content_type("application/javascript")
     |> send_resp(200, [
-      @html_before,
-      ~s[var socket = new Phoenix.Socket("#{url}");\n],
-      ~s[var interval = #{interval};\n],
-      ~s[var targetWindow = "#{target_window}";\n],
-      @html_after
+      Frame.phoenix_js()
     ])
     |> halt()
   end
@@ -193,5 +184,4 @@ defmodule Phoenix.LiveReloader do
   defp get_target_window(:parent), do: "parent"
 
   defp get_target_window(_), do: "top"
-
 end
