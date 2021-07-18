@@ -13,7 +13,6 @@ defmodule Phoenix.LiveReloaderTest do
     conn(:get, path)
     |> Plug.Conn.put_private(:phoenix_endpoint, MyApp.Endpoint)
   end
-
   test "renders frame with phoenix.js" do
     conn =
       conn("/phoenix/live_reload/frame")
@@ -29,6 +28,24 @@ defmodule Phoenix.LiveReloaderTest do
 
     assert to_string(conn.resp_body) =~
              ~s[var targetWindow = "top";\n]
+
+    refute to_string(conn.resp_body) =~
+             ~s[<iframe]
+  end
+
+  test "renders frame with phoenix.js imported when in ESM mode" do
+    conn =
+      conn("/phoenix/live_reload/frame")
+      |> put_private(:phoenix_endpoint, MyApp.EndpointESM)
+      |> Phoenix.LiveReloader.call([])
+
+    assert conn.status == 200
+
+    assert to_string(conn.resp_body) =~
+             ~s[<script type="module"]
+
+    assert to_string(conn.resp_body) =~
+             ~s[import * as Phoenix from './js/phoenix.js';\n]
 
     refute to_string(conn.resp_body) =~
              ~s[<iframe]
@@ -156,6 +173,16 @@ defmodule Phoenix.LiveReloaderTest do
 
     assert to_string(conn.resp_body) =~
       ~s[var targetWindow = "top";\n]
+  end
+
+  test "serves phoenix.js" do
+    conn =
+      conn("/phoenix/live_reload/js/phoenix.js")
+      |> Phoenix.LiveReloader.call([])
+
+    assert conn.status == 200
+
+    assert hd(get_resp_header(conn, "content-type")) =~ "application/javascript"
   end
 
 end

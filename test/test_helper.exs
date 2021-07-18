@@ -10,6 +10,20 @@ Application.put_env(:phoenix_live_reload, MyApp.Endpoint,
   ]
 )
 
+Application.put_env(:phoenix_live_reload, MyApp.EndpointESM,
+  pubsub_server: MyApp.PubSub,
+  live_reload: [
+    url: "ws://localhost:4000",
+    patterns: [
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+      ~r{web/views/.*(ex)$},
+      ~r{web/templates/.*(eex)$}
+    ],
+    phoenix_js_module_format: :esm
+  ]
+)
+
+
 Application.put_env(:phoenix_live_reload, MyApp.EndpointScript,
   live_reload: [
     url: "ws://localhost:4000",
@@ -51,6 +65,10 @@ defmodule MyApp.Endpoint do
   socket "/socket", Phoenix.LiveReloader.Socket, websocket: true, longpoll: true
 end
 
+defmodule MyApp.EndpointESM do
+  use Phoenix.Endpoint, otp_app: :phoenix_live_reload
+end
+
 defmodule MyApp.EndpointScript do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 end
@@ -70,6 +88,7 @@ end
 children = [
   {Phoenix.PubSub, name: MyApp.PubSub, adapter: Phoenix.PubSub.PG2},
   MyApp.Endpoint,
+  MyApp.EndpointESM,
   MyApp.EndpointScript,
   MyApp.EndpointConfig,
   MyApp.EndpointParentWindow,

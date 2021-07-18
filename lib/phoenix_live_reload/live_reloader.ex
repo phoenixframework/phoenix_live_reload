@@ -57,13 +57,18 @@ defmodule Phoenix.LiveReloader do
             socket "/phoenix/live_reload/socket/proxied/app/path", Phoenix.LiveReloader.Socket
             ...
           end
+    * `:phoenix_js_module_format` - the module format used for phoenix.js, e.g. `:esm`, `:amd`, `:umd`.
+      This option is pulled from the `:phoenix` configuration.
 
   """
 
   import Plug.Conn
   @behaviour Plug
 
-  require Phoenix.LiveReloader.Frame, as: Frame
+  @phoenix_js_path Application.app_dir(:phoenix, "priv/static/phoenix.js")
+  @reload_js_path Application.app_dir(:phoenix_live_reload, "priv/static/phoenix_live_reload.js")
+  @external_resource @phoenix_js_path
+  @external_resource @reload_js_path
 
   def init(opts) do
     opts
@@ -76,9 +81,12 @@ defmodule Phoenix.LiveReloader do
     interval = config[:interval] || 100
     target_window = get_target_window(config[:target_window])
 
+    js_module_format =
+      config[:phoenix_js_module_format] || Application.get_env(:phoenix, :js_module_format, :umd)
+
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, Frame.content(url, interval, target_window))
+    |> send_resp(200, frame_content(url, interval, target_window, js_module_format))
     |> halt()
   end
 
@@ -88,9 +96,7 @@ defmodule Phoenix.LiveReloader do
       ) do
     conn
     |> put_resp_content_type("application/javascript")
-    |> send_resp(200, [
-      Frame.phoenix_js()
-    ])
+    |> send_resp(200, [phoenix_js()])
     |> halt()
   end
 
@@ -104,6 +110,36 @@ defmodule Phoenix.LiveReloader do
     else
       conn
     end
+  end
+
+  defp frame_content(url, interval, target_window, js_module_format) do
+    [
+      "<html><body>",
+      script_tag(js_module_format),
+      ~s[var socket = new Phoenix.Socket("#{url}");\n],
+      ~s[var interval = #{interval};\n],
+      ~s[var targetWindow = "#{target_window}";\n],
+      File.read!(@reload_js_path),
+      "</script></body></html>"
+    ]
+  end
+
+  defp script_tag(js_module_format) do
+    if js_module_format == :esm do
+      """
+      <script type="module">
+      import * as Phoenix from './js/phoenix.js';
+      """
+    else
+      """
+      <script>
+      #{phoenix_js()}
+      """
+    end
+  end
+
+  defp phoenix_js do
+    File.read!(@phoenix_js_path) |> String.replace("//# sourceMappingURL=", "// ")
   end
 
   defp before_send_inject_reloader(conn, endpoint, config) do
