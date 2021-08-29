@@ -33,6 +33,9 @@ defmodule Phoenix.LiveReloader do
     * `:patterns` - a list of patterns to trigger the live reloading.
       This option is required to enable any live reloading.
 
+    * `:debounce` - an integer in milliseconds to wait before sending
+      live reload events to the browser.
+
     * `:iframe_attrs` - attrs to be given to the iframe injected by
       live reload. Expects a keyword list of atom keys and string values.
 
