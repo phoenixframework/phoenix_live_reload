@@ -3,6 +3,7 @@ defmodule Phoenix.LiveReloader.Channel do
   Phoenix's live-reload channel.
   """
   use Phoenix.Channel
+  alias Phoenix.LiveReloader.ChangeTracker
   require Logger
 
   def join("phoenix:live_reload", _msg, socket) do
@@ -30,9 +31,11 @@ defmodule Phoenix.LiveReloader.Channel do
       ext = Path.extname(path)
 
       for {path, ext} <- [{path, ext} | debounce(debounce, [ext], patterns)] do
-        asset_type = remove_leading_dot(ext)
-        Logger.debug("Live reload: #{Path.relative_to_cwd(path)}")
-        push(socket, "assets_change", %{asset_type: asset_type})
+        if ChangeTracker.put_new_hash(path) do
+          asset_type = remove_leading_dot(ext)
+          Logger.debug("Live reload: #{Path.relative_to_cwd(path)}")
+          push(socket, "assets_change", %{asset_type: asset_type})
+        end
       end
     end
 

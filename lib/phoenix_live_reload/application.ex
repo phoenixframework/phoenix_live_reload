@@ -3,7 +3,11 @@ defmodule Phoenix.LiveReloader.Application do
   require Logger
 
   def start(_type, _args) do
-    children = [%{id: __MODULE__, start: {__MODULE__, :start_link, []}}]
+    children = [
+      %{id: __MODULE__, start: {__MODULE__, :start_link, []}},
+      Phoenix.LiveReloader.ChangeTracker
+    ]
+
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 
