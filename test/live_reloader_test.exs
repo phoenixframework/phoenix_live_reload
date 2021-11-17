@@ -34,7 +34,7 @@ defmodule Phoenix.LiveReloaderTest do
              ~s[<iframe]
   end
 
-  test "injects live_reload for html requests if configured and contains <body> tag" do
+  test "injects live_reload for html requests if configured and contains </body> tag" do
     opts = Phoenix.LiveReloader.init([])
 
     conn =
@@ -45,6 +45,19 @@ defmodule Phoenix.LiveReloaderTest do
 
     assert to_string(conn.resp_body) ==
              "<html><body><h1>Phoenix</h1><iframe hidden height=\"0\" width=\"0\" src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
+  end
+
+  test "injects live_reload for html requests if configured and contains multiple </body> tags" do
+    opts = Phoenix.LiveReloader.init([])
+
+    conn =
+      conn("/")
+      |> put_resp_content_type("text/html")
+      |> Phoenix.LiveReloader.call(opts)
+      |> send_resp(200, "<html><body><h1><body>Phoenix</body></h1></body></html>")
+
+    assert to_string(conn.resp_body) ==
+             "<html><body><h1><body>Phoenix</body></h1><iframe hidden height=\"0\" width=\"0\" src=\"/phoenix/live_reload/frame\"></iframe></body></html>"
   end
 
   test "injects live_reload with script_name" do

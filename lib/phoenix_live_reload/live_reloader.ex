@@ -125,8 +125,9 @@ defmodule Phoenix.LiveReloader do
         resp_body = IO.iodata_to_binary(conn.resp_body)
 
         if has_body?(resp_body) and :code.is_loaded(endpoint) do
-          [page | rest] = String.split(resp_body, "</body>")
-          body = [page, reload_assets_tag(conn, endpoint, config), "</body>" | rest]
+          {head, [last]} = Enum.split(String.split(resp_body, "</body>"), -1)
+          head = Enum.intersperse(head, "</body>")
+          body = [head, reload_assets_tag(conn, endpoint, config), "</body>" | last]
           put_in(conn.resp_body, body)
         else
           conn
