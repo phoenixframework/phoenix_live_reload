@@ -88,34 +88,38 @@ defmodule Phoenix.LiveReloader do
     opts
   end
 
-  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame" | _suffix]} = conn, _) do
+  def call(%Plug.Conn{path_info: path_info, script_name: script_name} = conn, _) do
     endpoint = conn.private.phoenix_endpoint
     config = endpoint.config(:live_reload)
-    url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
-    interval = config[:interval] || 100
-    target_window = get_target_window(config[:target_window])
 
-    conn
-    |> put_resp_content_type("text/html")
-    |> send_resp(200, [
-      @html_before,
-      ~s[var socket = new Phoenix.Socket("#{url}");\n],
-      ~s[var interval = #{interval};\n],
-      ~s[var targetWindow = "#{target_window}";\n],
-      @html_after
-    ])
-    |> halt()
-  end
+    count = length(path_info) - length(script_name)
+    match_part = Enum.take(path_info, -count)
 
-  def call(conn, _) do
-    endpoint = conn.private.phoenix_endpoint
-    config = endpoint.config(:live_reload)
-    patterns = config[:patterns]
+    case match_part do
+      ["phoenix", "live_reload", "frame" | _suffix] ->
+        url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
+        interval = config[:interval] || 100
+        target_window = get_target_window(config[:target_window])
 
-    if patterns && patterns != [] do
-      before_send_inject_reloader(conn, endpoint, config)
-    else
-      conn
+        conn
+        |> put_resp_content_type("text/html")
+        |> send_resp(200, [
+          @html_before,
+          ~s[var socket = new Phoenix.Socket("#{url}");\n],
+          ~s[var interval = #{interval};\n],
+          ~s[var targetWindow = "#{target_window}";\n],
+          @html_after
+        ])
+        |> halt()
+
+      _ ->
+        patterns = config[:patterns]
+
+        if patterns && patterns != [] do
+          before_send_inject_reloader(conn, endpoint, config)
+        else
+          conn
+        end
     end
   end
 
@@ -198,5 +202,4 @@ defmodule Phoenix.LiveReloader do
   defp get_target_window(:parent), do: "parent"
 
   defp get_target_window(_), do: "top"
-
 end
