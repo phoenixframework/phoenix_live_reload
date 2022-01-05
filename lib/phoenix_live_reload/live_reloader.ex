@@ -60,6 +60,7 @@ defmodule Phoenix.LiveReloader do
             socket "/phoenix/live_reload/socket/proxied/app/path", Phoenix.LiveReloader.Socket
             ...
           end
+
     * `:reload_page_on_css_changes` - If true, CSS changes will trigger a full
       page reload like other asset types instead of the default hot reload.
       Useful when class names are determined at runtime, for example when
