@@ -45,7 +45,7 @@ var pageStrategy = function(chan){
 };
 
 var reloadStrategies = {
-  css: cssStrategy,
+  css: reloadPageOnCssChanges ? pageStrategy : cssStrategy,
   page: pageStrategy
 };
 

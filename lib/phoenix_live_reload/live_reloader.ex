@@ -61,6 +61,11 @@ defmodule Phoenix.LiveReloader do
             ...
           end
 
+    * `:reload_page_on_css_changes` - If true, CSS changes will trigger a full
+      page reload like other asset types instead of the default hot reload.
+      Useful when class names are determined at runtime, for example when
+      working with CSS modules. Defaults to false.
+
   """
 
   import Plug.Conn
@@ -94,6 +99,7 @@ defmodule Phoenix.LiveReloader do
     url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
     interval = config[:interval] || 100
     target_window = get_target_window(config[:target_window])
+    reload_page_on_css_changes? = config[:reload_page_on_css_changes] || false
 
     conn
     |> put_resp_content_type("text/html")
@@ -102,6 +108,7 @@ defmodule Phoenix.LiveReloader do
       ~s[var socket = new Phoenix.Socket("#{url}");\n],
       ~s[var interval = #{interval};\n],
       ~s[var targetWindow = "#{target_window}";\n],
+      ~s[var reloadPageOnCssChanges = #{reload_page_on_css_changes?};\n],
       @html_after
     ])
     |> halt()
@@ -198,5 +205,4 @@ defmodule Phoenix.LiveReloader do
   defp get_target_window(:parent), do: "parent"
 
   defp get_target_window(_), do: "top"
-
 end

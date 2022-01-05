@@ -30,6 +30,9 @@ defmodule Phoenix.LiveReloaderTest do
     assert to_string(conn.resp_body) =~
              ~s[var targetWindow = "top";\n]
 
+    assert to_string(conn.resp_body) =~
+             ~s[var reloadPageOnCssChanges = false;\n]
+
     refute to_string(conn.resp_body) =~
              ~s[<iframe]
   end
@@ -170,5 +173,4 @@ defmodule Phoenix.LiveReloaderTest do
     assert to_string(conn.resp_body) =~
       ~s[var targetWindow = "top";\n]
   end
-
 end
