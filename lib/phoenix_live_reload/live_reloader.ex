@@ -93,36 +93,38 @@ defmodule Phoenix.LiveReloader do
     opts
   end
 
-  def call(%Plug.Conn{path_info: ["phoenix", "live_reload", "frame" | _suffix]} = conn, _) do
+  def call(%Plug.Conn{path_info: path_info} = conn, _) do
     endpoint = conn.private.phoenix_endpoint
     config = endpoint.config(:live_reload)
-    url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
-    interval = config[:interval] || 100
-    target_window = get_target_window(config[:target_window])
-    reload_page_on_css_changes? = config[:reload_page_on_css_changes] || false
 
-    conn
-    |> put_resp_content_type("text/html")
-    |> send_resp(200, [
-      @html_before,
-      ~s[var socket = new Phoenix.Socket("#{url}");\n],
-      ~s[var interval = #{interval};\n],
-      ~s[var targetWindow = "#{target_window}";\n],
-      ~s[var reloadPageOnCssChanges = #{reload_page_on_css_changes?};\n],
-      @html_after
-    ])
-    |> halt()
-  end
+    path = endpoint.config(:url)[:path]
+    suffix = suffix(endpoint)
 
-  def call(conn, _) do
-    endpoint = conn.private.phoenix_endpoint
-    config = endpoint.config(:live_reload)
-    patterns = config[:patterns]
+    if path_info == String.split(path, "/", trim: true) ++ ["phoenix", "live_reload", "frame"] ++ String.split(suffix, "/", trim: true) do
+      url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
+      interval = config[:interval] || 100
+      target_window = get_target_window(config[:target_window])
+      reload_page_on_css_changes? = config[:reload_page_on_css_changes] || false
 
-    if patterns && patterns != [] do
-      before_send_inject_reloader(conn, endpoint, config)
-    else
       conn
+      |> put_resp_content_type("text/html")
+      |> send_resp(200, [
+        @html_before,
+        ~s[var socket = new Phoenix.Socket("#{url}");\n],
+        ~s[var interval = #{interval};\n],
+        ~s[var targetWindow = "#{target_window}";\n],
+        ~s[var reloadPageOnCssChanges = #{reload_page_on_css_changes?};\n],
+        @html_after
+      ])
+      |> halt()
+    else
+      patterns = config[:patterns]
+
+      if patterns && patterns != [] do
+        before_send_inject_reloader(conn, endpoint, config)
+      else
+        conn
+      end
     end
   end
 
