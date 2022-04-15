@@ -66,6 +66,25 @@ defmodule Phoenix.LiveReloader do
       Useful when class names are determined at runtime, for example when
       working with CSS modules. Defaults to false.
 
+  In an umbrella app, if you want to enable live reloading based on code
+  changes in sibling applications, set the `reloadable_apps` option on your
+  endpoint to ensure the code will be recompiled, then add the dirs to
+  `:phoenix_live_reload` to trigger page reloads:
+
+      # in config/dev.exs
+      root_path =
+        __ENV__.file
+        |> Path.dirname()
+        |> Path.join("..")
+        |> Path.expand()
+
+      config :phoenix_live_reload, :dirs, [
+        Path.join([root_path, "apps", "app1"]),
+        Path.join([root_path, "apps", "app2"]),
+      ]
+
+  You'll also want to be sure that the configured `:patterns` for
+  `live_reload` will match files in the sibling application.
   """
 
   import Plug.Conn
