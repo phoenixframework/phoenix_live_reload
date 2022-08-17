@@ -39,7 +39,7 @@ config :phoenix_live_reload,
   backend: :fs_poll
 ```
 
-By default the entire application directory is watched by the backend. However, with some environments and backends, this may be inefficient, resulting in slow response times to file modifications. To account for this, it's also possible to explicitly declare a list of directories for the backend to watch, and additional options for the backend:
+By default the entire application directory is watched by the backend. However, with some environments and backends, this may be inefficient, resulting in slow response times to file modifications. To account for this, it's also possible to explicitly declare a list of directories for the backend to watch (they must be relative to the project root, otherwise they are just ignored), and additional options for the backend:
 
 ```elixir
 config :phoenix_live_reload,
@@ -49,6 +49,8 @@ config :phoenix_live_reload,
     "lib/example_web/live",
     "lib/example_web/views",
     "lib/example_web/templates",
+    "../another_project/priv/static", # Contents of this directory is not watched
+    "/another_project/priv/static", # Contents of this directory is not watched
   ],
   backend: :fs_poll,
   backend_opts: [
