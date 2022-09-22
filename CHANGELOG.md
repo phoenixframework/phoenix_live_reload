@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0-dev
+
+* Improvements
+  * Allow reload events to be debounced instead of triggered immediately
+  * Add option to trigger full page reloads on css changes
+* Bug fixes
+  * Handle false positives on `</body>` tags
+
 ## 1.3.3 (2021-07-06)
 
 * Improvements
