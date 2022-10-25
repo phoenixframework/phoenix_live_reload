@@ -11,11 +11,14 @@ defmodule Phoenix.LiveReloader.Channel do
     if Process.whereis(:phoenix_live_reload_file_monitor) do
       FileSystem.subscribe(:phoenix_live_reload_file_monitor)
       config = socket.endpoint.config(:live_reload)
+      live_reload_config = socket.endpoint.config(:live_view)
 
       socket =
         socket
         |> assign(:patterns, config[:patterns] || [])
         |> assign(:debounce, config[:debounce] || 0)
+        |> assign(:notify_patterns, config[:notify] || [])
+        |> assign(:live_reload_topic, live_reload_config[:live_reload_topic] || nil)
 
       {:ok, socket}
     else
@@ -24,7 +27,12 @@ defmodule Phoenix.LiveReloader.Channel do
   end
 
   def handle_info({:file_event, _pid, {path, _event}}, socket) do
-    %{patterns: patterns, debounce: debounce} = socket.assigns
+    %{
+      patterns: patterns,
+      debounce: debounce,
+      notify_patterns: notify_patterns,
+      live_reload_topic: live_reload_topic
+    } = socket.assigns
 
     if matches_any_pattern?(path, patterns) do
       ext = Path.extname(path)
@@ -34,6 +42,14 @@ defmodule Phoenix.LiveReloader.Channel do
         Logger.debug("Live reload: #{Path.relative_to_cwd(path)}")
         push(socket, "assets_change", %{asset_type: asset_type})
       end
+    end
+
+    if matches_any_pattern?(path, notify_patterns) do
+      Phoenix.PubSub.broadcast(
+        socket.pubsub_server,
+        live_reload_topic,
+        {:phoenix_live_reload, live_reload_topic, path}
+      )
     end
 
     {:noreply, socket}
