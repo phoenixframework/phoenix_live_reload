@@ -11,14 +11,12 @@ defmodule Phoenix.LiveReloader.Channel do
     if Process.whereis(:phoenix_live_reload_file_monitor) do
       FileSystem.subscribe(:phoenix_live_reload_file_monitor)
       config = socket.endpoint.config(:live_reload)
-      live_reload_config = socket.endpoint.config(:live_view)
 
       socket =
         socket
         |> assign(:patterns, config[:patterns] || [])
         |> assign(:debounce, config[:debounce] || 0)
         |> assign(:notify_patterns, config[:notify] || [])
-        |> assign(:live_reload_topic, live_reload_config[:live_reload_topic] || nil)
 
       {:ok, socket}
     else
@@ -31,7 +29,6 @@ defmodule Phoenix.LiveReloader.Channel do
       patterns: patterns,
       debounce: debounce,
       notify_patterns: notify_patterns,
-      live_reload_topic: live_reload_topic
     } = socket.assigns
 
     if matches_any_pattern?(path, patterns) do
@@ -44,12 +41,14 @@ defmodule Phoenix.LiveReloader.Channel do
       end
     end
 
-    if matches_any_pattern?(path, notify_patterns) do
-      Phoenix.PubSub.broadcast(
-        socket.pubsub_server,
-        live_reload_topic,
-        {:phoenix_live_reload, live_reload_topic, path}
-      )
+    for {topic, patterns} <- notify_patterns do
+      if matches_any_pattern?(path, patterns) do
+        Phoenix.PubSub.broadcast(
+          socket.pubsub_server,
+          to_string(topic),
+          {:phoenix_live_reload, topic, path}
+          )
+      end
     end
 
     {:noreply, socket}
