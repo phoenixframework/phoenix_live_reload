@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.0-dev
+## 1.4.0 (2022-10-29)
 
 * Improvements
   * Allow reload events to be debounced instead of triggered immediately
