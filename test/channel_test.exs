@@ -87,4 +87,13 @@ defmodule Phoenix.LiveReloader.ChannelTest do
     send(socket.channel_pid, file_event('a/b/c/lib/live_web/views/user_view.ex', :created))
     assert_push "assets_change", %{asset_type: "ex"}
   end
+
+  @endpoint MyApp.ReloadEndpoint
+  test "sends notification for liveviews" do
+    {:ok, _, socket} =
+      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+    socket.endpoint.subscribe("live_view")
+    send(socket.channel_pid, file_event("lib/live_web/live/user_live.ex", :created))
+    assert_receive {:phoenix_live_reload, :live_view, "lib/live_web/live/user_live.ex"}
+  end
 end
