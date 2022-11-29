@@ -45,7 +45,32 @@ Application.put_env(:phoenix_live_reload, MyApp.EndpointWrongWindow,
   ]
 )
 
+Application.put_env(:phoenix_live_reload, MyApp.ReloadEndpoint,
+  pubsub_server: MyApp.PubSub,
+  live_reload: [
+    url: "ws://localhost:4000",
+    patterns: [
+      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/gettext/.*(po)$",
+      ~r{web/views/.*(ex)$},
+      ~r{web/templates/.*(eex)$}
+      ],
+    notify: [
+      live_view: [
+        ~r{web/components.ex$},
+        ~r{web/live/.*(ex)$}
+      ]
+    ]
+  ]
+)
+
 defmodule MyApp.Endpoint do
+  use Phoenix.Endpoint, otp_app: :phoenix_live_reload
+
+  socket "/socket", Phoenix.LiveReloader.Socket, websocket: true, longpoll: true
+end
+
+defmodule MyApp.ReloadEndpoint do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 
   socket "/socket", Phoenix.LiveReloader.Socket, websocket: true, longpoll: true
@@ -74,6 +99,7 @@ children = [
   MyApp.EndpointConfig,
   MyApp.EndpointParentWindow,
   MyApp.EndpointWrongWindow,
+  MyApp.ReloadEndpoint
 ]
 
 Supervisor.start_link(children, strategy: :one_for_one)
