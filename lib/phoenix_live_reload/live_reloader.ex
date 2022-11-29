@@ -33,6 +33,10 @@ defmodule Phoenix.LiveReloader do
     * `:patterns` - a list of patterns to trigger the live reloading.
       This option is required to enable any live reloading.
 
+    * `:notify` - a keyword list of topics pointing to a list of patterns.
+      A mesage of the form `{:phoenix_live_reload, topic, path}` will be
+      broadcast on the topic whenever file in the list of patterns changes.
+
     * `:debounce` - an integer in milliseconds to wait before sending
       live reload events to the browser. Defaults to `0`.
 

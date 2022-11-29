@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1 (2022-11-29)
+
+* Improvements
+  * Support new `:notify` configuration for third-party integration to file change events
+
 ## 1.4.0 (2022-10-29)
 
 * Improvements
