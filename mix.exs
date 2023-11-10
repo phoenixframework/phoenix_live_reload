@@ -42,7 +42,7 @@ defmodule PhoenixLiveReload.Mixfile do
     [
       {:phoenix, "~> 1.4"},
       {:ex_doc, "~> 0.19", only: :docs},
-      {:file_system, "~> 0.2.1 or ~> 0.3"},
+      {:file_system, "~> 0.3 or ~> 1.0"},
       {:jason, "~> 1.0", only: :test}
     ]
   end
