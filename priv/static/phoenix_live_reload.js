@@ -43,6 +43,11 @@ var cssStrategy = function(){
 
 var pageStrategy = function(chan){
   chan.off('assets_change');
+
+  if (restoreScrollOnReload) {
+    sessionStorage.setItem(SESSION_STORAGE_SCROLL_Y_KEY, window[targetWindow].scrollY);
+  }
+
   window[targetWindow].location.reload();
 };
 
@@ -55,10 +60,6 @@ socket.connect();
 var chan = socket.channel('phoenix:live_reload', {})
 chan.on('assets_change', function(msg) {
   var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.page;
-
-  if (restoreScrollOnReload && reloadStrategy === pageStrategy) {
-    sessionStorage.setItem(SESSION_STORAGE_SCROLL_Y_KEY, window[targetWindow].scrollY);
-  }
 
   setTimeout(function(){ reloadStrategy(chan); }, interval);
 });
