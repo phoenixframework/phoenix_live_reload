@@ -60,7 +60,6 @@ socket.connect();
 var chan = socket.channel('phoenix:live_reload', {})
 chan.on('assets_change', function(msg) {
   var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.page;
-
   setTimeout(function(){ reloadStrategy(chan); }, interval);
 });
 
