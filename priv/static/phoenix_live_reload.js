@@ -19,6 +19,8 @@ var buildFreshUrl = function(link){
   return newLink;
 };
 
+var SESSION_STORAGE_SCROLL_Y_KEY = '__phoenix_live_reload_scroll_y';
+
 var repaint = function(){
   var browser = navigator.userAgent.toLowerCase();
   if(browser.indexOf('chrome') > -1){
@@ -53,6 +55,27 @@ socket.connect();
 var chan = socket.channel('phoenix:live_reload', {})
 chan.on('assets_change', function(msg) {
   var reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.page;
+
+  if (restoreScrollOnReload) {
+    sessionStorage.setItem(SESSION_STORAGE_SCROLL_Y_KEY, window[targetWindow].scrollY);
+  }
+
   setTimeout(function(){ reloadStrategy(chan); }, interval);
 });
-chan.join();
+
+var optionallyRestoreScroll = function() {
+  if (restoreScrollOnReload) {
+    const scrollY = sessionStorage.getItem(SESSION_STORAGE_SCROLL_Y_KEY)
+
+    if (scrollY) {
+      const int = parseInt(scrollY, 10)
+
+      window[targetWindow].scrollTo(0, int);
+      sessionStorage.removeItem(SESSION_STORAGE_SCROLL_Y_KEY);
+    }
+  }
+}
+
+chan
+  .join()
+  .receive('ok', optionallyRestoreScroll);

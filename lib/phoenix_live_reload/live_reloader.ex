@@ -65,6 +65,10 @@ defmodule Phoenix.LiveReloader do
             ...
           end
 
+    * `:restore_scroll_on_reload` - If true, the scrollY position will be
+      restored after full page reloads. This is helpful when working on content
+      far below the fold. Defaults to false.
+
     * `:reload_page_on_css_changes` - If true, CSS changes will trigger a full
       page reload like other asset types instead of the default hot reload.
       Useful when class names are determined at runtime, for example when
@@ -121,6 +125,7 @@ defmodule Phoenix.LiveReloader do
     config = endpoint.config(:live_reload)
     url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
     interval = config[:interval] || 100
+    restore_scroll_on_reload = config[:restore_scroll_on_reload] || false
     target_window = get_target_window(config[:target_window])
     reload_page_on_css_changes? = config[:reload_page_on_css_changes] || false
 
@@ -131,6 +136,7 @@ defmodule Phoenix.LiveReloader do
       ~s[var socket = new Phoenix.Socket("#{url}");\n],
       ~s[var interval = #{interval};\n],
       ~s[var targetWindow = "#{target_window}";\n],
+      ~s[var restoreScrollOnReload = #{restore_scroll_on_reload};\n],
       ~s[var reloadPageOnCssChanges = #{reload_page_on_css_changes?};\n],
       @html_after
     ])
