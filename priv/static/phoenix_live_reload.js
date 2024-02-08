@@ -65,12 +65,12 @@ chan.on('assets_change', function(msg) {
 
 var optionallyRestoreScroll = function() {
   if (restoreScrollOnReload) {
-    const scrollY = sessionStorage.getItem(SESSION_STORAGE_SCROLL_Y_KEY)
+    const scrollYSerialized = sessionStorage.getItem(SESSION_STORAGE_SCROLL_Y_KEY)
 
-    if (scrollY) {
-      const int = parseInt(scrollY, 10)
+    if (scrollYSerialized) {
+      const scrollY = parseInt(scrollYSerialized, 10)
 
-      window[targetWindow].scrollTo(0, int);
+      window[targetWindow].scrollTo(0, scrollY);
       sessionStorage.removeItem(SESSION_STORAGE_SCROLL_Y_KEY);
     }
   }
