@@ -125,8 +125,8 @@ defmodule Phoenix.LiveReloader do
     config = endpoint.config(:live_reload)
     url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
     interval = config[:interval] || 100
-    restore_scroll_on_reload = config[:restore_scroll_on_reload] || false
     target_window = get_target_window(config[:target_window])
+    restore_scroll_on_reload? = config[:restore_scroll_on_reload] || false
     reload_page_on_css_changes? = config[:reload_page_on_css_changes] || false
 
     conn
@@ -136,7 +136,7 @@ defmodule Phoenix.LiveReloader do
       ~s[var socket = new Phoenix.Socket("#{url}");\n],
       ~s[var interval = #{interval};\n],
       ~s[var targetWindow = "#{target_window}";\n],
-      ~s[var restoreScrollOnReload = #{restore_scroll_on_reload};\n],
+      ~s[var restoreScrollOnReload = #{restore_scroll_on_reload?};\n],
       ~s[var reloadPageOnCssChanges = #{reload_page_on_css_changes?};\n],
       @html_after
     ])
