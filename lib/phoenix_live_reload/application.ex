@@ -2,8 +2,16 @@ defmodule Phoenix.LiveReloader.Application do
   use Application
   require Logger
 
+  alias Phoenix.LiveReloader.WebConsoleLogger
+
   def start(_type, _args) do
-    children = [%{id: __MODULE__, start: {__MODULE__, :start_link, []}}]
+    WebConsoleLogger.attach_logger()
+
+    children = [
+      WebConsoleLogger,
+      %{id: __MODULE__, start: {__MODULE__, :start_link, []}}
+    ]
+
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 

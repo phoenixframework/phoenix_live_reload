@@ -84,7 +84,7 @@ defmodule Phoenix.LiveReloader.ChannelTest do
   end
 
   test "sends notification for views", %{socket: socket} do
-    send(socket.channel_pid, file_event('a/b/c/lib/live_web/views/user_view.ex', :created))
+    send(socket.channel_pid, file_event(~c"a/b/c/lib/live_web/views/user_view.ex", :created))
     assert_push "assets_change", %{asset_type: "ex"}
   end
 
@@ -92,8 +92,47 @@ defmodule Phoenix.LiveReloader.ChannelTest do
   test "sends notification for liveviews" do
     {:ok, _, socket} =
       LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+
     socket.endpoint.subscribe("live_view")
     send(socket.channel_pid, file_event("lib/live_web/live/user_live.ex", :created))
     assert_receive {:phoenix_live_reload, :live_view, "lib/live_web/live/user_live.ex"}
+  end
+
+  require Logger
+
+  test "sends logs for web console only when enabled" do
+    Application.delete_env(:phoenix_live_reload, :web_console_logger)
+    Application.delete_env(:phoenix_live_reload, :editor_url)
+
+    {:ok, info, _socket} =
+      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+
+    assert info == %{}
+    Logger.info("hello")
+
+    refute_receive _
+
+    Application.put_env(:phoenix_live_reload, :web_console_logger, true)
+
+    {:ok, info, _socket} =
+      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+
+    assert info == %{}
+
+    Logger.info("hello again")
+    assert_receive %Phoenix.Socket.Message{event: "log", payload: %{msg: msg, level: "info"}}
+    assert msg =~ "hello again"
+  end
+
+  test "sends editor_url and relative_path only when configurd" do
+    Application.put_env(:phoenix_live_reload, :editor_url, "vscode://file/__FILE__:__LINE__")
+
+    {:ok, info, _socket} =
+      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+
+    assert info == %{
+             editor_url: "vscode://file/__FILE__:__LINE__",
+             relative_path: File.cwd!()
+           }
   end
 end

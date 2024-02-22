@@ -5,11 +5,20 @@ defmodule Phoenix.LiveReloader.Channel do
   use Phoenix.Channel
   require Logger
 
+  alias Phoenix.LiveReloader.WebConsoleLogger
+
+  @logs :logs
+
   def join("phoenix:live_reload", _msg, socket) do
     {:ok, _} = Application.ensure_all_started(:phoenix_live_reload)
 
     if Process.whereis(:phoenix_live_reload_file_monitor) do
       FileSystem.subscribe(:phoenix_live_reload_file_monitor)
+
+      if web_console_logger_enabled?() do
+        WebConsoleLogger.subscribe(@logs)
+      end
+
       config = socket.endpoint.config(:live_reload)
 
       socket =
@@ -18,7 +27,7 @@ defmodule Phoenix.LiveReloader.Channel do
         |> assign(:debounce, config[:debounce] || 0)
         |> assign(:notify_patterns, config[:notify] || [])
 
-      {:ok, socket}
+      {:ok, join_info(socket), socket}
     else
       {:error, %{message: "live reload backend not running"}}
     end
@@ -28,7 +37,7 @@ defmodule Phoenix.LiveReloader.Channel do
     %{
       patterns: patterns,
       debounce: debounce,
-      notify_patterns: notify_patterns,
+      notify_patterns: notify_patterns
     } = socket.assigns
 
     if matches_any_pattern?(path, patterns) do
@@ -47,9 +56,20 @@ defmodule Phoenix.LiveReloader.Channel do
           socket.pubsub_server,
           to_string(topic),
           {:phoenix_live_reload, topic, path}
-          )
+        )
       end
     end
+
+    {:noreply, socket}
+  end
+
+  def handle_info({@logs, %{level: level, msg: msg, meta: meta}}, socket) do
+    push(socket, "log", %{
+      level: to_string(level),
+      msg: msg,
+      file: meta[:file],
+      line: meta[:line]
+    })
 
     {:noreply, socket}
   end
@@ -87,4 +107,24 @@ defmodule Phoenix.LiveReloader.Channel do
 
   defp remove_leading_dot("." <> rest), do: rest
   defp remove_leading_dot(rest), do: rest
+
+  defp web_console_logger_enabled? do
+    Application.get_env(:phoenix_live_reload, :web_console_logger) == true
+  end
+
+  defp join_info(_socket) do
+    if url = editor_url() do
+      %{editor_url: url, relative_path: File.cwd!()}
+    else
+      %{}
+    end
+  end
+
+  defp editor_url do
+    case Application.fetch_env(:phoenix_live_reload, :editor_url) do
+      {:ok, editor_url} when is_binary(editor_url) -> editor_url
+      {:ok, _other} -> nil
+      :error -> System.get_env("ELIXIR_EDITOR_URL")
+    end
+  end
 end
