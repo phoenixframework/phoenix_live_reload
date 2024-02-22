@@ -1,5 +1,7 @@
 defmodule Phoenix.LiveReloader.ChannelTest do
   use ExUnit.Case
+  require Logger
+
   import Phoenix.ChannelTest
 
   alias Phoenix.LiveReloader
@@ -10,6 +12,13 @@ defmodule Phoenix.LiveReloader.ChannelTest do
 
   defp file_event(path, event) do
     {:file_event, self(), {path, event}}
+  end
+
+  defp update_live_reload_env(endpoint, func) do
+    conf = Application.get_env(:phoenix_live_reload, endpoint)[:live_reload] || []
+    new_conf = func.(conf)
+    Application.put_env(:phoenix_live_reload, endpoint, new_conf)
+    endpoint.config_change([{endpoint, [live_reload: new_conf]}], [])
   end
 
   setup do
@@ -98,11 +107,11 @@ defmodule Phoenix.LiveReloader.ChannelTest do
     assert_receive {:phoenix_live_reload, :live_view, "lib/live_web/live/user_live.ex"}
   end
 
-  require Logger
-
+  @endpoint MyApp.LogEndpoint
   test "sends logs for web console only when enabled" do
-    Application.delete_env(:phoenix_live_reload, :web_console_logger)
-    Application.delete_env(:phoenix_live_reload, :editor_url)
+    update_live_reload_env(@endpoint, fn conf ->
+      Keyword.drop(conf, [:web_console_logger, :editor_url])
+    end)
 
     {:ok, info, _socket} =
       LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
@@ -112,7 +121,9 @@ defmodule Phoenix.LiveReloader.ChannelTest do
 
     refute_receive _
 
-    Application.put_env(:phoenix_live_reload, :web_console_logger, true)
+    update_live_reload_env(@endpoint, fn conf ->
+      Keyword.merge(conf, web_console_logger: true)
+    end)
 
     {:ok, info, _socket} =
       LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
@@ -125,7 +136,18 @@ defmodule Phoenix.LiveReloader.ChannelTest do
   end
 
   test "sends editor_url and relative_path only when configurd" do
-    Application.put_env(:phoenix_live_reload, :editor_url, "vscode://file/__FILE__:__LINE__")
+    update_live_reload_env(@endpoint, fn conf ->
+      Keyword.drop(conf, [:editor_url])
+    end)
+
+    {:ok, info, _socket} =
+      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+
+    assert info == %{}
+
+    update_live_reload_env(@endpoint, fn conf ->
+      Keyword.merge(conf, editor_url: "vscode://file/__FILE__:__LINE__")
+    end)
 
     {:ok, info, _socket} =
       LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})

@@ -64,6 +64,10 @@ Application.put_env(:phoenix_live_reload, MyApp.ReloadEndpoint,
   ]
 )
 
+Application.put_env(:phoenix_live_reload, MyApp.LogEndpoint,
+  pubsub_server: MyApp.PubSub
+)
+
 defmodule MyApp.Endpoint do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 
@@ -92,6 +96,12 @@ defmodule MyApp.EndpointWrongWindow do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 end
 
+defmodule MyApp.LogEndpoint do
+  use Phoenix.Endpoint, otp_app: :phoenix_live_reload
+
+  socket "/socket", Phoenix.LiveReloader.Socket, websocket: true, longpoll: true
+end
+
 children = [
   {Phoenix.PubSub, name: MyApp.PubSub, adapter: Phoenix.PubSub.PG2},
   MyApp.Endpoint,
@@ -99,7 +109,8 @@ children = [
   MyApp.EndpointConfig,
   MyApp.EndpointParentWindow,
   MyApp.EndpointWrongWindow,
-  MyApp.ReloadEndpoint
+  MyApp.ReloadEndpoint,
+  MyApp.LogEndpoint
 ]
 
 Supervisor.start_link(children, strategy: :one_for_one)

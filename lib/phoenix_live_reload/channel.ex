@@ -15,7 +15,7 @@ defmodule Phoenix.LiveReloader.Channel do
     if Process.whereis(:phoenix_live_reload_file_monitor) do
       FileSystem.subscribe(:phoenix_live_reload_file_monitor)
 
-      if web_console_logger_enabled?() do
+      if web_console_logger_enabled?(socket) do
         WebConsoleLogger.subscribe(@logs)
       end
 
@@ -108,20 +108,22 @@ defmodule Phoenix.LiveReloader.Channel do
   defp remove_leading_dot("." <> rest), do: rest
   defp remove_leading_dot(rest), do: rest
 
-  defp web_console_logger_enabled? do
-    Application.get_env(:phoenix_live_reload, :web_console_logger) == true
+  defp web_console_logger_enabled?(socket) do
+    socket.endpoint.config(:live_reload)[:web_console_logger] == true
   end
 
-  defp join_info(_socket) do
-    if url = editor_url() do
+  defp join_info(socket) do
+    if url = editor_url(socket) do
       %{editor_url: url, relative_path: File.cwd!()}
     else
       %{}
     end
   end
 
-  defp editor_url do
-    case Application.fetch_env(:phoenix_live_reload, :editor_url) do
+  defp editor_url(socket) do
+    conf = socket.endpoint.config(:live_reload) || []
+
+    case Keyword.fetch(conf, :editor_url) do
       {:ok, editor_url} when is_binary(editor_url) -> editor_url
       {:ok, _other} -> nil
       :error -> System.get_env("ELIXIR_EDITOR_URL")
