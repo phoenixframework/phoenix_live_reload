@@ -88,7 +88,9 @@ class LiveReloader {
   disableServerLogs(){ this.logsEnabled = false }
 
   openEditor(targetNode){
-    if(!this.editorURL){ return console.log("cannot openEditor without configured ELIXIR_EDITOR_URL") }
+    if(!this.editorURL){
+      return console.error("phoenix_live_reload cannot openEditor without configured ELIXIR_EDITOR_URL")
+    }
 
     let fileLine = this.closestDebugFileLine(targetNode)
     if(fileLine){
