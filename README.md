@@ -6,7 +6,7 @@ You can use `phoenix_live_reload` in your projects by adding it to your `mix.exs
 
 ```elixir
 def deps do
-  [{:phoenix_live_reload, "~> 1.3"}]
+  [{:phoenix_live_reload, "~> 1.5"}]
 end
 ```
 
@@ -22,6 +22,60 @@ config :my_app, MyAppWeb.Endpoint,
 ```
 
 The default interval is 100ms.
+
+
+## Streaming serving logs to the web console
+
+Streaming server logs that you see in the terminal when running `mix phx.server` can be useful to have on the client during development, especially when debugging with SPA fetch callbacks, GraphQL queries, or LiveView actions in the browsers web console. You can enable log streaming to collocate client and server logs in the web console with the `web_console_logger` configuration in your `config/dev.exs`:
+
+```elixir
+config :my_app, MyAppWeb.Endpoint,
+  live_reload: [
+    interval: 1000,
+    patterns: [...],
+    web_console_logger: true
+  ]
+```
+
+Next, you'll need to listen for the `"phx:live_reload:loaded"` event and enable client logging by calling the reloader's `enableServerLogs()` function, for example:
+
+```javascript
+window.addEventListener("phx:live_reload:loaded", ({detail: {reloader}}) => {
+  // enable server log streaming to client.
+  // disable with reloader.disableServerLogs()
+  reloader.enableServerLogs()
+})
+```
+
+## Jumping to HEEx function definitions
+
+Many times it's useful to inspect the HTML DOM tree to find where markup is being rendered from within your application. HEEx supports annotating rendered HTML with HTML comments that give you the file/line of a HEEx function component. `:phoenix_live_reload` can use of this information to launch a configured URL of your choice to open your code editor to the file-line of the HTML annotation. For example, the `elixir_editor_url` configuration can be added to `conig/dev.exs`:
+
+```elixir
+config :my_app, MyAppWeb.Endpoint,
+  live_reload: [
+    interval: 1000,
+    patterns: [...],
+    web_console_logger: true,
+    elixir_editor_url: "vscode://file/__FILE__:__LINE__"
+  ]
+```
+
+We passed `vscode://` protocol URL to open vscode with placeholders of `__FILE__:__LINE__`, which will be substited at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:loaded"` callback and make use of the reloader's `openEditor` function, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
+
+```javascript
+window.addEventListener("phx:live_reload:loaded", ({detail: {reloader}}) => {
+  // enable server log streaming to client.
+  reloader.enableServerLogs() // disable with reloader.disableServerLogs()
+  // open configured ELIXIR_EDITOR_URL at file:line of the alt-clicked element's HEEx component
+  window.addEventListener("click", e => {
+    if(!e.altKey){ return }
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    reloader.openEditor(e.target)
+  }, true)
+})
+```
 
 ## Backends
 
