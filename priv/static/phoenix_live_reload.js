@@ -49,20 +49,23 @@ let reloadStrategies = {
 
 class LiveReloader {
   constructor(socket){
+    this.socket = socket
     this.logsEnabled = false
     this.enabledOnce = false
     this.editorURL = null
     this.relativePath = null
   }
   enable(){
-    if(!this.enabledOnce){
-      if(parent.document.readyState === "loaded"){
-        this.dispatchReady()
+    this.socket.onOpen(() => {
+      if(this.enabledOnce){ return }
+      this.enabledOnce = true
+      if(["complete", "loaded", "interactive"].indexOf(parent.document.readyState) >= 0){
+        this.dispatchConnected()
       } else {
-        parent.addEventListener("load", () => this.dispatchReady())
+        parent.addEventListener("load", () => this.dispatchConnected())
       }
-    }
-    this.enabledOnce = true
+    })
+
     this.channel = socket.channel("phoenix:live_reload", {})
     this.channel.on("assets_change", msg => {
       let reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.page
@@ -73,7 +76,7 @@ class LiveReloader {
       this.editorURL = editor_url
       this.relativePath = relative_path
     })
-    socket.connect()
+    this.socket.connect()
   }
 
   disable(){
@@ -96,8 +99,8 @@ class LiveReloader {
 
   // private
 
-  dispatchReady(){
-    parent.dispatchEvent(new CustomEvent("phx:live_reload:loaded", {detail: {reloader: this}}))
+  dispatchConnected(){
+    parent.dispatchEvent(new CustomEvent("phx:live_reload:connected", {detail: this}))
   }
 
   log(level, str){

@@ -37,10 +37,10 @@ config :my_app, MyAppWeb.Endpoint,
   ]
 ```
 
-Next, you'll need to listen for the `"phx:live_reload:loaded"` event and enable client logging by calling the reloader's `enableServerLogs()` function, for example:
+Next, you'll need to listen for the `"phx:live_reload:connected"` event and enable client logging by calling the reloader's `enableServerLogs()` function, for example:
 
 ```javascript
-window.addEventListener("phx:live_reload:loaded", ({detail: {reloader}}) => {
+window.addEventListener("phx:live_reload:connected", ({detail: reloader}) => {
   // enable server log streaming to client.
   // disable with reloader.disableServerLogs()
   reloader.enableServerLogs()
@@ -61,10 +61,10 @@ config :my_app, MyAppWeb.Endpoint,
   ]
 ```
 
-We passed `vscode://` protocol URL to open vscode with placeholders of `__FILE__:__LINE__`, which will be substited at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:loaded"` callback and make use of the reloader's `openEditor` function, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
+We passed `vscode://` protocol URL to open vscode with placeholders of `__FILE__:__LINE__`, which will be substited at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:connected"` callback and make use of the reloader's `openEditor` function, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
 
 ```javascript
-window.addEventListener("phx:live_reload:loaded", ({detail: {reloader}}) => {
+window.addEventListener("phx:live_reload:connected", ({detail: reloader}) => {
   // enable server log streaming to client.
   reloader.enableServerLogs() // disable with reloader.disableServerLogs()
   // open configured ELIXIR_EDITOR_URL at file:line of the alt-clicked element's HEEx component
