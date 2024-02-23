@@ -5,6 +5,8 @@ defmodule Phoenix.LiveReloader.Application do
   alias Phoenix.LiveReloader.WebConsoleLogger
 
   def start(_type, _args) do
+    # note we always attach and start the logger as :phoenix_live_reload should only
+    # be started in dev via user's `only: :dev` entry.
     WebConsoleLogger.attach_logger()
 
     children = [
