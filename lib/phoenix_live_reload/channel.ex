@@ -27,7 +27,7 @@ defmodule Phoenix.LiveReloader.Channel do
         |> assign(:debounce, config[:debounce] || 0)
         |> assign(:notify_patterns, config[:notify] || [])
 
-      {:ok, join_info(socket), socket}
+      {:ok, join_info(), socket}
     else
       {:error, %{message: "live reload backend not running"}}
     end
@@ -112,21 +112,11 @@ defmodule Phoenix.LiveReloader.Channel do
     socket.endpoint.config(:live_reload)[:web_console_logger] == true
   end
 
-  defp join_info(socket) do
-    if url = editor_url(socket) do
+  defp join_info do
+    if url = System.get_env("ELIXIR_EDITOR_URL") do
       %{editor_url: url, relative_path: File.cwd!()}
     else
       %{}
-    end
-  end
-
-  defp editor_url(socket) do
-    conf = socket.endpoint.config(:live_reload) || []
-
-    case Keyword.fetch(conf, :editor_url) do
-      {:ok, editor_url} when is_binary(editor_url) -> editor_url
-      {:ok, _other} -> nil
-      :error -> System.get_env("ELIXIR_EDITOR_URL")
     end
   end
 end

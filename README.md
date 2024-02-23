@@ -49,19 +49,13 @@ window.addEventListener("phx:live_reload:connected", ({detail: reloader}) => {
 
 ## Jumping to HEEx function definitions
 
-Many times it's useful to inspect the HTML DOM tree to find where markup is being rendered from within your application. HEEx supports annotating rendered HTML with HTML comments that give you the file/line of a HEEx function component. `:phoenix_live_reload` can use of this information to launch a configured URL of your choice to open your code editor to the file-line of the HTML annotation. For example, the `editor_url` configuration can be added to `conig/dev.exs`:
+Many times it's useful to inspect the HTML DOM tree to find where markup is being rendered from within your application. HEEx supports annotating rendered HTML with HTML comments that give you the file/line of a HEEx function component. `:phoenix_live_reload` will look for the `ELIXIR_EDITOR_URL` environment export to launch a configured URL of your choice to open your code editor to the file-line of the HTML annotation. For example, the following export on your system would open vscode at the correct file/line:
 
-```elixir
-config :my_app, MyAppWeb.Endpoint,
-  live_reload: [
-    interval: 1000,
-    patterns: [...],
-    web_console_logger: true,
-    editor_url: "vscode://file/__FILE__:__LINE__"
-  ]
+```
+export ELIXIR_EDITOR_URL="vscode://file/__FILE__:__LINE__"
 ```
 
-We passed `vscode://` protocol URL to open vscode with placeholders of `__FILE__:__LINE__`, which will be substited at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:connected"` callback and make use of the reloader's `openEditor` function, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
+The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substited at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:connected"` callback and make use of the reloader's `openEditor` function, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
 
 ```javascript
 window.addEventListener("phx:live_reload:connected", ({detail: reloader}) => {
