@@ -49,7 +49,7 @@ window.addEventListener("phx:live_reload:connected", ({detail: reloader}) => {
 
 ## Jumping to HEEx function definitions
 
-Many times it's useful to inspect the HTML DOM tree to find where markup is being rendered from within your application. HEEx supports annotating rendered HTML with HTML comments that give you the file/line of a HEEx function component. `:phoenix_live_reload` can use of this information to launch a configured URL of your choice to open your code editor to the file-line of the HTML annotation. For example, the `elixir_editor_url` configuration can be added to `conig/dev.exs`:
+Many times it's useful to inspect the HTML DOM tree to find where markup is being rendered from within your application. HEEx supports annotating rendered HTML with HTML comments that give you the file/line of a HEEx function component. `:phoenix_live_reload` can use of this information to launch a configured URL of your choice to open your code editor to the file-line of the HTML annotation. For example, the `editor_url` configuration can be added to `conig/dev.exs`:
 
 ```elixir
 config :my_app, MyAppWeb.Endpoint,
@@ -57,7 +57,7 @@ config :my_app, MyAppWeb.Endpoint,
     interval: 1000,
     patterns: [...],
     web_console_logger: true,
-    elixir_editor_url: "vscode://file/__FILE__:__LINE__"
+    editor_url: "vscode://file/__FILE__:__LINE__"
   ]
 ```
 
