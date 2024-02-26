@@ -113,7 +113,7 @@ defmodule Phoenix.LiveReloader.Channel do
   end
 
   defp join_info do
-    if url = System.get_env("ELIXIR_EDITOR_URL") do
+    if url = System.get_env("PLUG_EDITOR") do
       %{editor_url: url, relative_path: File.cwd!()}
     else
       %{}

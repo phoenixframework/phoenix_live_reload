@@ -109,7 +109,7 @@ defmodule Phoenix.LiveReloader.ChannelTest do
 
   @endpoint MyApp.LogEndpoint
   test "sends logs for web console only when enabled" do
-    System.delete_env("ELIXIR_EDITOR_URL")
+    System.delete_env("PLUG_EDITOR")
     update_live_reload_env(@endpoint, fn conf ->
       Keyword.drop(conf, [:web_console_logger])
     end)
@@ -137,14 +137,14 @@ defmodule Phoenix.LiveReloader.ChannelTest do
   end
 
   test "sends editor_url and relative_path only when configurd" do
-    System.delete_env("ELIXIR_EDITOR_URL")
+    System.delete_env("PLUG_EDITOR")
 
     {:ok, info, _socket} =
       LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
 
     assert info == %{}
 
-    System.put_env("ELIXIR_EDITOR_URL", "vscode://file/__FILE__:__LINE__")
+    System.put_env("PLUG_EDITOR", "vscode://file/__FILE__:__LINE__")
 
     {:ok, info, _socket} =
       LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})

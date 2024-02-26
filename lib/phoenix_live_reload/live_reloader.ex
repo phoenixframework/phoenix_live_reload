@@ -75,11 +75,6 @@ defmodule Phoenix.LiveReloader do
       *Note*: your appplication javascript bundle will need to enable logs.
       See the README for more information.
 
-    * `:elixir_editor_url` - The protocol URL of your elixir editor for opening HEEx
-      files from annotated file:line comments. Defaults to `nil`.
-      *Note*: your appplication javascript bundle will need to wire up invocation.
-      See the README for more information.
-
   In an umbrella app, if you want to enable live reloading based on code
   changes in sibling applications, set the `reloadable_apps` option on your
   endpoint to ensure the code will be recompiled, then add the dirs to

@@ -89,7 +89,7 @@ class LiveReloader {
 
   openEditor(targetNode){
     if(!this.editorURL){
-      return console.error("phoenix_live_reload cannot openEditor without configured ELIXIR_EDITOR_URL")
+      return console.error("phoenix_live_reload cannot openEditor without configured PLUG_EDITOR")
     }
 
     let fileLine = this.closestDebugFileLine(targetNode)
