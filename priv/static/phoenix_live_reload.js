@@ -87,12 +87,12 @@ class LiveReloader {
   enableServerLogs(){ this.logsEnabled = true }
   disableServerLogs(){ this.logsEnabled = false }
 
-  openEditor(targetNode){
+  openEditorAtCaller(targetNode){
     if(!this.editorURL){
-      return console.error("phoenix_live_reload cannot openEditor without configured PLUG_EDITOR")
+      return console.error("phoenix_live_reload cannot openEditorAtCaller without configured PLUG_EDITOR")
     }
 
-    let fileLine = this.closestDebugFileLine(targetNode)
+    let fileLine = this.closestCallerFileLine(targetNode)
     if(fileLine){
       let [file, line] = fileLine.split(":")
       let fullPath = [this.relativePath, file].join("/")
@@ -101,6 +101,19 @@ class LiveReloader {
     }
   }
 
+  openEditorAtDef(targetNode){
+    if(!this.editorURL){
+      return console.error("phoenix_live_reload cannot openEditorAtDef without configured PLUG_EDITOR")
+    }
+
+    let fileLine = this.closestDefFileLine(targetNode)
+    if(fileLine){
+      let [file, line] = fileLine.split(":")
+      let fullPath = [this.relativePath, file].join("/")
+      let url = this.editorURL.replace("__FILE__", fullPath).replace("__LINE__", line)
+      window.open(url, "_self")
+    }
+  }
   // private
 
   dispatchConnected(){
@@ -113,15 +126,32 @@ class LiveReloader {
     console[consoleFunc](`%c📡 [${level}] ${str}`, `color: ${levelColor};`)
   }
 
-  closestDebugFileLine(node){
+  closestCallerFileLine(node){
     while(node.previousSibling){
       node = node.previousSibling
       if(node.nodeType === Node.COMMENT_NODE){
-        let match = node.nodeValue.match(/.*>\s([\w\/]+.*ex:\d+)/i)
-        if(match){ return match[1] }
+        let callerComment = node.previousSibling
+        let callerMatch = callerComment &&
+          callerComment.nodeType === Node.COMMENT_NODE &&
+          callerComment.nodeValue.match(/\s@caller\s+(.+):(\d+)\s/i)
+
+        if(callerMatch){
+          return `${callerMatch[1]}:${callerMatch[2]}`
+        }
       }
     }
-    if(node.parentNode){ return this.closestDebugFileLine(node.parentNode) }
+    if(node.parentNode){ return this.closestCallerFileLine(node.parentNode) }
+  }
+
+  closestDefFileLine(node){
+    while(node.previousSibling){
+      node = node.previousSibling
+      if(node.nodeType === Node.COMMENT_NODE){
+        let fcMatch = node.nodeValue.match(/.*>\s([\w\/]+.*ex:\d+)/i)
+        if(fcMatch){ return fcMatch[1] }
+      }
+    }
+    if(node.parentNode){ return this.closestDefFileLine(node.parentNode) }
   }
 }
 

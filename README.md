@@ -49,25 +49,38 @@ window.addEventListener("phx:live_reload:connected", ({detail: reloader}) => {
 
 ## Jumping to HEEx function definitions
 
-Many times it's useful to inspect the HTML DOM tree to find where markup is being rendered from within your application. HEEx supports annotating rendered HTML with HTML comments that give you the file/line of a HEEx function component. `:phoenix_live_reload` will look for the `PLUG_EDITOR` environment export to launch a configured URL of your choice to open your code editor to the file-line of the HTML annotation. For example, the following export on your system would open vscode at the correct file/line:
+Many times it's useful to inspect the HTML DOM tree to find where markup is being rendered from within your application. HEEx supports annotating rendered HTML with HTML comments that give you the file/line of a HEEx function component and caller. `:phoenix_live_reload` will look for the `PLUG_EDITOR` environment export (used by the plug debugger page to link to source code) to launch a configured URL of your choice to open your code editor to the file-line of the HTML annotation. For example, the following export on your system would open vscode at the correct file/line:
 
 ```
 export PLUG_EDITOR="vscode://file/__FILE__:__LINE__"
 ```
 
-The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substited at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:connected"` callback and make use of the reloader's `openEditor` function, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
+The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substited at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:connected"` callback and make use of the reloader's `openEditorAtCaller` and `openEditorAtDef` functions, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
 
 ```javascript
 window.addEventListener("phx:live_reload:connected", ({detail: reloader}) => {
-  // enable server log streaming to client.
-  reloader.enableServerLogs() // disable with reloader.disableServerLogs()
-  // open configured PLUG_EDITOR at file:line of the alt-clicked element's HEEx component
+  // Enable server log streaming to client. Disable with reloader.disableServerLogs()
+  reloader.enableServerLogs()
+
+  // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
+  //
+  //   * click with "c" key pressed to open at caller location
+  //   * click with "d" key pressed to open at function component definition location
+  let keyDown
+  window.addEventListener("keydown", e => keyDown = e.key)
+  window.addEventListener("keyup", e => keyDown = null)
   window.addEventListener("click", e => {
-    if(!e.altKey){ return }
-    e.preventDefault()
-    e.stopImmediatePropagation()
-    reloader.openEditor(e.target)
+    if(keyDown === "c"){
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      reloader.openEditorAtCaller(e.target)
+    } else if(keyDown === "d"){
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      reloader.openEditorAtDef(e.target)
+    }
   }, true)
+  window.liveReloader = reloader
 })
 ```
 
