@@ -53,7 +53,6 @@ class LiveReloader {
     this.logsEnabled = false
     this.enabledOnce = false
     this.editorURL = null
-    this.relativePath = null
   }
   enable(){
     this.socket.onOpen(() => {
@@ -72,9 +71,8 @@ class LiveReloader {
       setTimeout(() => reloadStrategy(this.channel), interval)
     })
     this.channel.on("log", ({msg, level}) => this.logsEnabled && this.log(level, msg))
-    this.channel.join().receive("ok", ({editor_url, relative_path}) => {
+    this.channel.join().receive("ok", ({editor_url}) => {
       this.editorURL = editor_url
-      this.relativePath = relative_path
     })
     this.socket.connect()
   }
@@ -92,12 +90,9 @@ class LiveReloader {
       return console.error("phoenix_live_reload cannot openEditorAtCaller without configured PLUG_EDITOR")
     }
 
-    let fileLine = this.closestCallerFileLine(targetNode)
-    if(fileLine){
-      let [file, line] = fileLine.split(":")
-      let fullPath = [this.relativePath, file].join("/")
-      let url = this.editorURL.replace("__FILE__", fullPath).replace("__LINE__", line)
-      window.open(url, "_self")
+    let fileLineApp = this.closestCallerFileLine(targetNode)
+    if(fileLineApp){
+      this.openFullPath(...fileLineApp)
     }
   }
 
@@ -106,15 +101,24 @@ class LiveReloader {
       return console.error("phoenix_live_reload cannot openEditorAtDef without configured PLUG_EDITOR")
     }
 
-    let fileLine = this.closestDefFileLine(targetNode)
-    if(fileLine){
-      let [file, line] = fileLine.split(":")
-      let fullPath = [this.relativePath, file].join("/")
-      let url = this.editorURL.replace("__FILE__", fullPath).replace("__LINE__", line)
-      window.open(url, "_self")
+    let fileLineApp = this.closestDefFileLine(targetNode)
+    if(fileLineApp){
+      this.openFullPath(...fileLineApp)
     }
   }
+
   // private
+
+  openFullPath(file, line, app){
+    console.log("opening full path", file, line, app)
+    this.channel.push("full_path", {rel_path: file, app: app})
+      .receive("ok", ({full_path}) => {
+        console.log("full path", full_path)
+        let url = this.editorURL.replace("__FILE__", full_path).replace("__LINE__", line)
+        window.open(url, "_self")
+      })
+      .receive("error", reason => console.error("failed to resolve full path", reason))
+  }
 
   dispatchConnected(){
     parent.dispatchEvent(new CustomEvent("phx:live_reload:connected", {detail: this}))
@@ -133,10 +137,10 @@ class LiveReloader {
         let callerComment = node.previousSibling
         let callerMatch = callerComment &&
           callerComment.nodeType === Node.COMMENT_NODE &&
-          callerComment.nodeValue.match(/\s@caller\s+(.+):(\d+)\s/i)
+          callerComment.nodeValue.match(/\s@caller\s+(.+):(\d+)\s\((.*)\)\s/i)
 
         if(callerMatch){
-          return `${callerMatch[1]}:${callerMatch[2]}`
+          return [callerMatch[1], callerMatch[2], callerMatch[3]]
         }
       }
     }
@@ -147,8 +151,10 @@ class LiveReloader {
     while(node.previousSibling){
       node = node.previousSibling
       if(node.nodeType === Node.COMMENT_NODE){
-        let fcMatch = node.nodeValue.match(/.*>\s([\w\/]+.*ex:\d+)/i)
-        if(fcMatch){ return fcMatch[1] }
+        let fcMatch = node.nodeValue.match(/.*>\s([\w\/]+.*ex):(\d+)\s\((.*)\)\s/i)
+        if(fcMatch){
+          return [fcMatch[1], fcMatch[2], fcMatch[3]]
+        }
       }
     }
     if(node.parentNode){ return this.closestDefFileLine(node.parentNode) }

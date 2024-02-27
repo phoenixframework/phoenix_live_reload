@@ -19,6 +19,9 @@ defmodule Phoenix.LiveReloader.Channel do
         WebConsoleLogger.subscribe(@logs)
       end
 
+      deps_paths =
+        for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
+
       config = socket.endpoint.config(:live_reload)
 
       socket =
@@ -26,6 +29,7 @@ defmodule Phoenix.LiveReloader.Channel do
         |> assign(:patterns, config[:patterns] || [])
         |> assign(:debounce, config[:debounce] || 0)
         |> assign(:notify_patterns, config[:notify] || [])
+        |> assign(:deps_paths, deps_paths)
 
       {:ok, join_info(), socket}
     else
@@ -72,6 +76,16 @@ defmodule Phoenix.LiveReloader.Channel do
     })
 
     {:noreply, socket}
+  end
+
+  def handle_in("full_path", %{"rel_path" => rel_path, "app" => app}, socket) do
+    case socket.assigns.deps_paths do
+      %{^app => dep_path} ->
+        {:reply, {:ok, %{full_path: Path.join(dep_path, rel_path)}}, socket}
+
+      %{} ->
+        {:reply, {:ok, %{full_path: Path.join(File.cwd!(), rel_path)}}, socket}
+    end
   end
 
   defp debounce(0, _exts, _patterns), do: []
