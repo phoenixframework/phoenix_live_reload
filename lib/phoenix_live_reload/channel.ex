@@ -125,7 +125,7 @@ defmodule Phoenix.LiveReloader.Channel do
 
   defp join_info do
     if url = System.get_env("PLUG_EDITOR") do
-      %{editor_url: url, relative_path: File.cwd!()}
+      %{editor_url: url}
     else
       %{}
     end
