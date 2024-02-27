@@ -19,9 +19,6 @@ defmodule Phoenix.LiveReloader.Channel do
         WebConsoleLogger.subscribe(@logs)
       end
 
-      deps_paths =
-        for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
-
       config = socket.endpoint.config(:live_reload)
 
       socket =
@@ -29,7 +26,7 @@ defmodule Phoenix.LiveReloader.Channel do
         |> assign(:patterns, config[:patterns] || [])
         |> assign(:debounce, config[:debounce] || 0)
         |> assign(:notify_patterns, config[:notify] || [])
-        |> assign(:deps_paths, deps_paths)
+        |> assign(:deps_paths, deps_paths())
 
       {:ok, join_info(), socket}
     else
@@ -129,6 +126,14 @@ defmodule Phoenix.LiveReloader.Channel do
   defp join_info do
     if url = System.get_env("PLUG_EDITOR") do
       %{editor_url: url, relative_path: File.cwd!()}
+    else
+      %{}
+    end
+  end
+
+  defp deps_paths do
+    if Code.loaded?(Mix.Project) do
+      for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
     else
       %{}
     end
