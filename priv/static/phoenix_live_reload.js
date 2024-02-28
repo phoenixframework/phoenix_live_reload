@@ -121,7 +121,7 @@ class LiveReloader {
   }
 
   dispatchConnected(){
-    parent.dispatchEvent(new CustomEvent("phx:live_reload:connected", {detail: this}))
+    parent.dispatchEvent(new CustomEvent("phx:live_reload:attached", {detail: this}))
   }
 
   log(level, str){
