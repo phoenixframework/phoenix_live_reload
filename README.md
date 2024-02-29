@@ -23,8 +23,9 @@ config :my_app, MyAppWeb.Endpoint,
 
 The default interval is 100ms.
 
-
 ## Streaming serving logs to the web console
+
+> *Note:* This feature is only available for Elixir v1.15+
 
 Streaming server logs that you see in the terminal when running `mix phx.server` can be useful to have on the client during development, especially when debugging with SPA fetch callbacks, GraphQL queries, or LiveView actions in the browsers web console. You can enable log streaming to collocate client and server logs in the web console with the `web_console_logger` configuration in your `config/dev.exs`:
 

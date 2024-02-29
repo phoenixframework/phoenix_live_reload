@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0 (2024-02-29)
+
+* Improvements
+  * Introduce streaming server logs to the browser's web console with the new `:web_console_logger` endpoint configuration
+  * Introduce `openEditorAtCaller` and `openEditorAtDef` client functions for opening the developer's configured `PLUG_EDITOR` to the elixir source file/line given a DOM element
+  * Dispatch `"phx:live_reload:attached"` to parent window when live reload is attached to server and awaiting changes
+
+
 ## 1.4.1 (2022-11-29)
 
 * Improvements

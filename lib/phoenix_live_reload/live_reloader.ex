@@ -72,8 +72,8 @@ defmodule Phoenix.LiveReloader do
 
     * `:web_console_logger` - If true, the live reloader will log messages
       to the web console in your browser. Defaults to false.
-      *Note*: your appplication javascript bundle will need to enable logs.
-      See the README for more information.
+      *Note*: Requires Elixir v1.15+ and your appplication javascript bundle will need
+      to enable logs. See the README for more information.
 
   In an umbrella app, if you want to enable live reloading based on code
   changes in sibling applications, set the `reloadable_apps` option on your

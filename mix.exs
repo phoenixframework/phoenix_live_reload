@@ -1,7 +1,7 @@
 defmodule PhoenixLiveReload.Mixfile do
   use Mix.Project
 
-  @version "1.5.0-dev"
+  @version "1.5.0"
 
   def project do
     [
@@ -34,14 +34,16 @@ defmodule PhoenixLiveReload.Mixfile do
   def application do
     [
       mod: {Phoenix.LiveReloader.Application, []},
-      applications: [:logger, :phoenix, :file_system]
+      extra_applications: [:logger, :phoenix, :file_system]
     ]
   end
 
   defp deps do
     [
       {:phoenix, "~> 1.4"},
-      {:ex_doc, "~> 0.19", only: :docs},
+      {:ex_doc, "~> 0.29", only: :docs},
+      {:makeup_eex, ">= 0.1.1", only: :docs},
+      {:makeup_diff, "~> 0.1", only: :docs},
       {:file_system, "~> 0.3 or ~> 1.0"},
       {:jason, "~> 1.0", only: :test}
     ]
