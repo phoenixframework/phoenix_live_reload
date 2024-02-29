@@ -5,11 +5,20 @@ defmodule Phoenix.LiveReloader.Channel do
   use Phoenix.Channel
   require Logger
 
+  alias Phoenix.LiveReloader.WebConsoleLogger
+
+  @logs :logs
+
   def join("phoenix:live_reload", _msg, socket) do
     {:ok, _} = Application.ensure_all_started(:phoenix_live_reload)
 
     if Process.whereis(:phoenix_live_reload_file_monitor) do
       FileSystem.subscribe(:phoenix_live_reload_file_monitor)
+
+      if web_console_logger_enabled?(socket) do
+        WebConsoleLogger.subscribe(@logs)
+      end
+
       config = socket.endpoint.config(:live_reload)
 
       socket =
@@ -17,8 +26,9 @@ defmodule Phoenix.LiveReloader.Channel do
         |> assign(:patterns, config[:patterns] || [])
         |> assign(:debounce, config[:debounce] || 0)
         |> assign(:notify_patterns, config[:notify] || [])
+        |> assign(:deps_paths, deps_paths())
 
-      {:ok, socket}
+      {:ok, join_info(), socket}
     else
       {:error, %{message: "live reload backend not running"}}
     end
@@ -28,7 +38,7 @@ defmodule Phoenix.LiveReloader.Channel do
     %{
       patterns: patterns,
       debounce: debounce,
-      notify_patterns: notify_patterns,
+      notify_patterns: notify_patterns
     } = socket.assigns
 
     if matches_any_pattern?(path, patterns) do
@@ -47,11 +57,32 @@ defmodule Phoenix.LiveReloader.Channel do
           socket.pubsub_server,
           to_string(topic),
           {:phoenix_live_reload, topic, path}
-          )
+        )
       end
     end
 
     {:noreply, socket}
+  end
+
+  def handle_info({@logs, %{level: level, msg: msg, meta: meta}}, socket) do
+    push(socket, "log", %{
+      level: to_string(level),
+      msg: msg,
+      file: meta[:file],
+      line: meta[:line]
+    })
+
+    {:noreply, socket}
+  end
+
+  def handle_in("full_path", %{"rel_path" => rel_path, "app" => app}, socket) do
+    case socket.assigns.deps_paths do
+      %{^app => dep_path} ->
+        {:reply, {:ok, %{full_path: Path.join(dep_path, rel_path)}}, socket}
+
+      %{} ->
+        {:reply, {:ok, %{full_path: Path.join(File.cwd!(), rel_path)}}, socket}
+    end
   end
 
   defp debounce(0, _exts, _patterns), do: []
@@ -87,4 +118,24 @@ defmodule Phoenix.LiveReloader.Channel do
 
   defp remove_leading_dot("." <> rest), do: rest
   defp remove_leading_dot(rest), do: rest
+
+  defp web_console_logger_enabled?(socket) do
+    socket.endpoint.config(:live_reload)[:web_console_logger] == true
+  end
+
+  defp join_info do
+    if url = System.get_env("PLUG_EDITOR") do
+      %{editor_url: url}
+    else
+      %{}
+    end
+  end
+
+  defp deps_paths do
+    if Code.loaded?(Mix.Project) do
+      for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
+    else
+      %{}
+    end
+  end
 end
