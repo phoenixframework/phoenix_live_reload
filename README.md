@@ -56,7 +56,7 @@ Many times it's useful to inspect the HTML DOM tree to find where markup is bein
 export PLUG_EDITOR="vscode://file/__FILE__:__LINE__"
 ```
 
-The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substited at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:attached"` callback and make use of the reloader's `openEditorAtCaller` and `openEditorAtDef` functions, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
+The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substituted at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:attached"` callback and make use of the reloader's `openEditorAtCaller` and `openEditorAtDef` functions, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
 
 ```javascript
 window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
