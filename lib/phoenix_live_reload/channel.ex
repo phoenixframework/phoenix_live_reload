@@ -132,7 +132,8 @@ defmodule Phoenix.LiveReloader.Channel do
   end
 
   defp deps_paths do
-    if Code.loaded?(Mix.Project) do
+    # TODO: Use `Code.loaded?` on Elixir v1.15+
+    if :erlang.module_loaded(Mix.Project) do
       for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
     else
       %{}
