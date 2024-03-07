@@ -9,6 +9,10 @@ defmodule Phoenix.LiveReloader.Application do
     # be started in dev via user's `only: :dev` entry.
     WebConsoleLogger.attach_logger()
 
+    # the deps paths are read by the channel when getting the full_path for
+    # opening the configured PLUG_EDITOR
+    :persistent_term.put(:phoenix_live_reload_deps_paths, deps_paths())
+
     children = [
       WebConsoleLogger,
       %{id: __MODULE__, start: {__MODULE__, :start_link, []}}
@@ -46,6 +50,15 @@ defmodule Phoenix.LiveReloader.Application do
         """)
 
         other
+    end
+  end
+
+  defp deps_paths do
+    # TODO: Use `Code.loaded?` on Elixir v1.15+
+    if :erlang.module_loaded(Mix.Project) do
+      for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
+    else
+      %{}
     end
   end
 end
