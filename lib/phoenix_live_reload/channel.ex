@@ -26,7 +26,6 @@ defmodule Phoenix.LiveReloader.Channel do
         |> assign(:patterns, config[:patterns] || [])
         |> assign(:debounce, config[:debounce] || 0)
         |> assign(:notify_patterns, config[:notify] || [])
-        |> assign(:deps_paths, deps_paths())
 
       {:ok, join_info(), socket}
     else
@@ -76,7 +75,7 @@ defmodule Phoenix.LiveReloader.Channel do
   end
 
   def handle_in("full_path", %{"rel_path" => rel_path, "app" => app}, socket) do
-    case socket.assigns.deps_paths do
+    case :persistent_term.get(:phoenix_live_reload_deps_paths) do
       %{^app => dep_path} ->
         {:reply, {:ok, %{full_path: Path.join(dep_path, rel_path)}}, socket}
 
@@ -126,15 +125,6 @@ defmodule Phoenix.LiveReloader.Channel do
   defp join_info do
     if url = System.get_env("PLUG_EDITOR") do
       %{editor_url: url}
-    else
-      %{}
-    end
-  end
-
-  defp deps_paths do
-    # TODO: Use `Code.loaded?` on Elixir v1.15+
-    if :erlang.module_loaded(Mix.Project) do
-      for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
     else
       %{}
     end
