@@ -30,7 +30,7 @@ let cssStrategy = () => {
     "link[rel=stylesheet]:not([data-no-reload]):not([data-pending-removal])"
   )
 
-  ([].slice).call(reloadableLinkElements)
+  Array.from(reloadableLinkElements)
     .filter(link => link.href)
     .forEach(link => buildFreshUrl(link))
 
