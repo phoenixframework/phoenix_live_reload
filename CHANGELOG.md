@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.2
+
+* Bug fixes
+  * Fix CSS updates failing with errors
+  * Fix logging errors caused by unknown server log types
+
 ## 1.5.1 (2024-02-29)
 
 * Bug fixes
