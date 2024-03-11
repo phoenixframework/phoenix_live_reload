@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.5.2
+## 1.5.2 (2024-03-11)
 
 * Bug fixes
   * Fix CSS updates failing with errors
