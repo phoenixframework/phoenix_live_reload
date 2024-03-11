@@ -63,12 +63,12 @@ defmodule Phoenix.LiveReloader.Channel do
     {:noreply, socket}
   end
 
-  def handle_info({@logs, %{level: level, msg: msg, meta: meta}}, socket) do
+  def handle_info({@logs, %{level: level, msg: msg, file: file, line: line}}, socket) do
     push(socket, "log", %{
       level: to_string(level),
       msg: msg,
-      file: meta[:file],
-      line: meta[:line]
+      file: file,
+      line: line
     })
 
     {:noreply, socket}

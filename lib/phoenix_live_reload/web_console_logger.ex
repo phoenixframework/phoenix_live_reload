@@ -28,8 +28,11 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
     msg = IO.iodata_to_binary(iodata)
 
     Registry.dispatch(@registry, :all, fn entries ->
-      for {pid, prefix} <- entries,
-          do: send(pid, {prefix, %{level: level, msg: msg, meta: meta}})
+      event = %{level: level, msg: msg, file: meta[:file], line: meta[:line]}
+
+      for {pid, prefix} <- entries do
+        send(pid, {prefix, event})
+      end
     end)
   end
 end
