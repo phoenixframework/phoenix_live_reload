@@ -94,10 +94,11 @@ class LiveReloader {
     socket.disconnect()
   }
 
-  enableServerLogs(){ this.logsEnabled = true }
+  enableServerLogs(level = this.minLogLevel){ 
+    this.logsEnabled = true
+    this.minLogLevel = level
+  }
   disableServerLogs(){ this.logsEnabled = false }
-
-  setMinLogLevel(level){ this.minLogLevel = level }
 
   isMinLogLevel(level){
     return elixirLogLevels.indexOf(level) <= elixirLogLevels.indexOf(this.minLogLevel)
