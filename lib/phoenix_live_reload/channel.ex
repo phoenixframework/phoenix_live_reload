@@ -64,12 +64,14 @@ defmodule Phoenix.LiveReloader.Channel do
   end
 
   def handle_info({@logs, %{level: level, msg: msg, file: file, line: line}}, socket) do
-    push(socket, "log", %{
-      level: to_string(level),
-      msg: msg,
-      file: file,
-      line: line
-    })
+    if is_log_min_log_level?(socket, level) do
+      push(socket, "log", %{
+        level: to_string(level),
+        msg: msg,
+        file: file,
+        line: line
+      })
+    end
 
     {:noreply, socket}
   end
@@ -120,6 +122,13 @@ defmodule Phoenix.LiveReloader.Channel do
 
   defp web_console_logger_enabled?(socket) do
     socket.endpoint.config(:live_reload)[:web_console_logger] == true
+  end
+
+  defp is_log_min_log_level?(socket, log_level) do
+    socket.endpoint.config(:live_reload)[:web_console_logger_min_log_level] |> case do
+      nil -> true
+      level -> Logger.compare_levels(log_level, level) != :lt
+    end
   end
 
   defp join_info do

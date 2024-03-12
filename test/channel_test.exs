@@ -152,4 +152,33 @@ defmodule Phoenix.LiveReloader.ChannelTest do
 
     assert info == %{editor_url: "vscode://file/__FILE__:__LINE__"}
   end
+
+  test "send valid logs with a minimum log level" do
+    System.delete_env("PLUG_EDITOR")
+
+    update_live_reload_env(@endpoint, fn conf ->
+      Keyword.merge(conf, web_console_logger: true, web_console_logger_min_log_level: :error)
+    end)
+
+    {:ok, info, _socket} =
+      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+
+    assert info == %{}
+    Logger.info("hello")
+
+    refute_receive _
+
+    update_live_reload_env(@endpoint, fn conf ->
+      Keyword.drop(conf, [:web_console_logger_min_log_level])
+    end)
+
+    {:ok, info, _socket} =
+      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+
+    assert info == %{}
+
+    Logger.info("hello again")
+    assert_receive %Phoenix.Socket.Message{event: "log", payload: %{msg: msg, level: "info"}}
+    assert msg =~ "hello again"
+  end
 end
