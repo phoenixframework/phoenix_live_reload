@@ -2,6 +2,7 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
   @moduledoc false
 
   @registry Phoenix.LiveReloader.WebConsoleLoggerRegistry
+  @compile {:no_warn_undefined, {Logger, :default_formatter, 0}}
 
   def attach_logger do
     if function_exported?(Logger, :default_formatter, 0) do
