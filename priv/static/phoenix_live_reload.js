@@ -125,7 +125,7 @@ class LiveReloader {
   }
 
   log(level, str){
-    let levelColor = level === "debug" ? "cyan" : "inherit"
+    let levelColor = level === "debug" ? "darkcyan" : "inherit"
     let consoleFunc = level === "error" ? level : "log"
     console[consoleFunc](`%c📡 ${str}`, `color: ${levelColor};`)
   }
