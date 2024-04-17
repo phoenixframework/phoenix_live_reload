@@ -126,8 +126,27 @@ class LiveReloader {
 
   log(level, str){
     let levelColor = level === "debug" ? "darkcyan" : "inherit"
-    let consoleFunc = level === "error" ? level : "log"
-    console[consoleFunc](`%c📡 ${str}`, `color: ${levelColor};`)
+    let consoleFunc = this.logFunc(level)
+    this.logMsg(consoleFunc, str, levelColor)
+  }
+
+  logMsg(fun, str, color) {
+    fun(`%c📡 ${str}`, `color: ${color};`)
+  }
+  
+  logFunc(level){
+    switch(level) {
+      case "debug":
+        return console.debug;
+      case "info":
+        return console.info;
+      case "warning":
+        return console.warn;
+      case "error":
+        return console.error;
+      default:
+        return console.log;
+    }
   }
 
   closestCallerFileLine(node){
