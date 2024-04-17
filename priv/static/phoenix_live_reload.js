@@ -142,10 +142,8 @@ class LiveReloader {
         return console.info;
       case "warning":
         return console.warn;
-      case "error":
-        return console.error;
       default:
-        return console.log;
+        return console.error;
     }
   }
 
