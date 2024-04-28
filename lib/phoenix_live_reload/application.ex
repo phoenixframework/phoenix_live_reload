@@ -3,19 +3,18 @@ defmodule Phoenix.LiveReloader.Application do
   require Logger
 
   alias Phoenix.LiveReloader.WebConsoleLogger
-  alias Phoenix.LiveReloader.WebConsoleLoggerInitializer
 
   def start(_type, _args) do
     # note we always attach and start the logger as :phoenix_live_reload should only
     # be started in dev via user's `only: :dev` entry.
+    WebConsoleLogger.attach_logger()
 
     # the deps paths are read by the channel when getting the full_path for
     # opening the configured PLUG_EDITOR
     :persistent_term.put(:phoenix_live_reload_deps_paths, deps_paths())
 
     children = [
-      Registry.child_spec(name: WebConsoleLogger.registry(), keys: :duplicate),
-      WebConsoleLoggerInitializer,
+      WebConsoleLogger,
       %{id: __MODULE__, start: {__MODULE__, :start_link, []}}
     ]
 
@@ -52,6 +51,12 @@ defmodule Phoenix.LiveReloader.Application do
 
         other
     end
+  end
+
+  def prep_stop(_state) do
+    # We need to detach the logger before the Registry is stopped
+    WebConsoleLogger.detach_logger()
+    :ok
   end
 
   defp deps_paths do

@@ -4,8 +4,6 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
   @registry Phoenix.LiveReloader.WebConsoleLoggerRegistry
   @compile {:no_warn_undefined, {Logger, :default_formatter, 0}}
 
-  def registry, do: @registry
-
   def attach_logger do
     if function_exported?(Logger, :default_formatter, 0) do
       :ok =
@@ -19,6 +17,10 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
     if function_exported?(Logger, :default_formatter, 0) do
       :ok = :logger.remove_handler(__MODULE__)
     end
+  end
+
+  def child_spec(_args) do
+    Registry.child_spec(name: @registry, keys: :duplicate)
   end
 
   def subscribe(prefix) do
