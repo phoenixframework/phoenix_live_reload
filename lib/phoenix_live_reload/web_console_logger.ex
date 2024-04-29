@@ -1,8 +1,11 @@
 defmodule Phoenix.LiveReloader.WebConsoleLogger do
   @moduledoc false
+  use GenServer
 
   @registry Phoenix.LiveReloader.WebConsoleLoggerRegistry
   @compile {:no_warn_undefined, {Logger, :default_formatter, 0}}
+
+  def registry, do: @registry
 
   def attach_logger do
     if function_exported?(Logger, :default_formatter, 0) do
@@ -13,13 +16,37 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
     end
   end
 
-  def child_spec(_args) do
-    Registry.child_spec(name: @registry, keys: :duplicate)
+  def detach_logger do
+    if function_exported?(Logger, :default_formatter, 0) do
+      :ok = :logger.remove_handler(__MODULE__)
+    end
   end
 
   def subscribe(prefix) do
     {:ok, _} = Registry.register(@registry, :all, prefix)
     :ok
+  end
+
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  end
+
+  @impl GenServer
+  def init(opts) do
+    # We need to trap exits so that we receive the `terminate/2` callback during
+    # a graceful shutdown
+    Process.flag(:trap_exit, true)
+
+    attach_logger()
+
+    {:ok, opts}
+  end
+
+  @impl GenServer
+  def terminate(_reason, state) do
+    # On shutdown we need to detach the logger before the Registry stops
+    detach_logger()
+    {:ok, state}
   end
 
   # Erlang/OTP log handler
