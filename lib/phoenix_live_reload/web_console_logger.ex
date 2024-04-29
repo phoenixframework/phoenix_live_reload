@@ -17,8 +17,6 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
   end
 
   def detach_logger do
-    Registry.child_spec(name: @registry, keys: :duplicate)
-
     if function_exported?(Logger, :default_formatter, 0) do
       :ok = :logger.remove_handler(__MODULE__)
     end
