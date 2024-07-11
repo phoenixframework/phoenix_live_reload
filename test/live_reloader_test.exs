@@ -141,12 +141,12 @@ defmodule Phoenix.LiveReloaderTest do
       |> Phoenix.LiveReloader.call(opts)
       |> send_resp(200, [
         "<html>",
-        '<bo',
+        ~c"<bo",
         [?d, ?y | ">"],
         "<h1>Phoenix</h1>",
         "</b",
         ?o,
-        'dy>',
+        ~c"dy>",
         "</html>"
       ])
 
@@ -161,7 +161,7 @@ defmodule Phoenix.LiveReloaderTest do
       |> Phoenix.LiveReloader.call([])
 
     assert to_string(conn.resp_body) =~
-      ~s[var targetWindow = "parent";\n]
+             ~s[var targetWindow = "parent";\n]
   end
 
   test "wrong window target defaults to top" do
@@ -171,6 +171,6 @@ defmodule Phoenix.LiveReloaderTest do
       |> Phoenix.LiveReloader.call([])
 
     assert to_string(conn.resp_body) =~
-      ~s[var targetWindow = "top";\n]
+             ~s[var targetWindow = "top";\n]
   end
 end

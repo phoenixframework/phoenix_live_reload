@@ -108,33 +108,37 @@ defmodule Phoenix.LiveReloader.ChannelTest do
   end
 
   @endpoint MyApp.LogEndpoint
-  test "sends logs for web console only when enabled" do
-    System.delete_env("PLUG_EDITOR")
+  # web console logger relies on Logger.default_formatter/0
+  # which is only available since Elixir v1.15
+  if Version.match?(System.version(), ">= 1.15.0") do
+    test "sends logs for web console only when enabled" do
+      System.delete_env("PLUG_EDITOR")
 
-    update_live_reload_env(@endpoint, fn conf ->
-      Keyword.drop(conf, [:web_console_logger])
-    end)
+      update_live_reload_env(@endpoint, fn conf ->
+        Keyword.drop(conf, [:web_console_logger])
+      end)
 
-    {:ok, info, _socket} =
-      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+      {:ok, info, _socket} =
+        LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
 
-    assert info == %{}
-    Logger.info("hello")
+      assert info == %{}
+      Logger.info("hello")
 
-    refute_receive _
+      refute_receive _
 
-    update_live_reload_env(@endpoint, fn conf ->
-      Keyword.merge(conf, web_console_logger: true)
-    end)
+      update_live_reload_env(@endpoint, fn conf ->
+        Keyword.merge(conf, web_console_logger: true)
+      end)
 
-    {:ok, info, _socket} =
-      LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
+      {:ok, info, _socket} =
+        LiveReloader.Socket |> socket() |> subscribe_and_join(Channel, "phoenix:live_reload", %{})
 
-    assert info == %{}
+      assert info == %{}
 
-    Logger.info("hello again")
-    assert_receive %Phoenix.Socket.Message{event: "log", payload: %{msg: msg, level: "info"}}
-    assert msg =~ "hello again"
+      Logger.info("hello again")
+      assert_receive %Phoenix.Socket.Message{event: "log", payload: %{msg: msg, level: "info"}}
+      assert msg =~ "hello again"
+    end
   end
 
   test "sends editor_url and relative_path only when configurd" do
