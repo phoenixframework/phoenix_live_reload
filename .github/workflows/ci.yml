@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  tests:
+    name: Run tests (${{ matrix.image }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: 1.11.4-erlang-21.3.8.24-debian-buster-20240513-slim
+          - image: 1.17.2-erlang-27.0.1-debian-bookworm-20240701-slim
+
+    runs-on: ubuntu-latest
+    container:
+      image: hexpm/elixir:${{ matrix.image }}
+
+    steps:
+    - name: Install inotify-tools
+      run: apt update && apt -y install inotify-tools
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Hex and Rebar setup
+      run: |
+        mix local.hex --force
+        mix local.rebar --force
+
+    - name: Restore deps and _build cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          deps
+          _build
+        key: deps-${{ runner.os }}-${{ matrix.image }}-${{ hashFiles('**/mix.lock') }}
+        restore-keys: |
+          deps-${{ runner.os }}-${{ matrix.image }}
+    - name: Install dependencies
+      run: mix deps.get --only test
+
+    - name: Run tests
+      run: mix test
