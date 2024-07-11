@@ -34,14 +34,14 @@ Application.put_env(:phoenix_live_reload, MyApp.EndpointConfig,
 Application.put_env(:phoenix_live_reload, MyApp.EndpointParentWindow,
   pubsub_server: MyApp.PubSub,
   live_reload: [
-    target_window: :parent,
+    target_window: :parent
   ]
 )
 
 Application.put_env(:phoenix_live_reload, MyApp.EndpointWrongWindow,
   pubsub_server: MyApp.PubSub,
   live_reload: [
-    target_window: "other",
+    target_window: "other"
   ]
 )
 
@@ -54,7 +54,7 @@ Application.put_env(:phoenix_live_reload, MyApp.ReloadEndpoint,
       ~r"priv/gettext/.*(po)$",
       ~r{web/views/.*(ex)$},
       ~r{web/templates/.*(eex)$}
-      ],
+    ],
     notify: [
       live_view: [
         ~r{web/components.ex$},
@@ -64,9 +64,7 @@ Application.put_env(:phoenix_live_reload, MyApp.ReloadEndpoint,
   ]
 )
 
-Application.put_env(:phoenix_live_reload, MyApp.LogEndpoint,
-  pubsub_server: MyApp.PubSub
-)
+Application.put_env(:phoenix_live_reload, MyApp.LogEndpoint, pubsub_server: MyApp.PubSub)
 
 defmodule MyApp.Endpoint do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
