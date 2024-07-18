@@ -114,7 +114,10 @@ class LiveReloader {
     this.channel.push("full_path", {rel_path: file, app: app})
       .receive("ok", ({full_path}) => {
         console.log("full path", full_path)
-        let url = this.editorURL.replace("__FILE__", full_path).replace("__LINE__", line)
+        let url = this.editorURL
+          .replace("__RELATIVEFILE__", file)  
+          .replace("__FILE__", full_path)
+          .replace("__LINE__", line)
         window.open(url, "_self")
       })
       .receive("error", reason => console.error("failed to resolve full path", reason))
