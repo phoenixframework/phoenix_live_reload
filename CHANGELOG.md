@@ -4,7 +4,7 @@
 
 * Enhancements
   * Add support for `__RELATIVEFILE__` when invoking editors
-  * Change the default target window to `:top` to not reload the whole page if a Phoenix app is shown inside an iframe. You can get the old behavior back by setting the `:target_window` option to `:top`:
+  * Change the default target window to `:parent` to not reload the whole page if a Phoenix app is shown inside an iframe. You can get the old behavior back by setting the `:target_window` option to `:top`:
     ```elixir
     config :phoenix_live_reload, MyAppWeb.Endpoint,
       target_window: :top,
