@@ -229,7 +229,7 @@ defmodule Phoenix.LiveReloader do
 
   defp suffix(endpoint), do: endpoint.config(:live_reload)[:suffix] || ""
 
-  defp get_target_window(:parent), do: "parent"
+  defp get_target_window(:top), do: "top"
 
-  defp get_target_window(_), do: "top"
+  defp get_target_window(_), do: "parent"
 end

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.0
+
+* Enhancements
+  * Change the default target window to `:top` to not reload the whole page if a Phoenix app is shown inside an iframe. You can get the old behavior back by setting the `:target_window` option to `:top`:
+    ```elixir
+    config :phoenix_live_reload, MyAppWeb.Endpoint,
+      target_window: :top,
+      ...
+    ```
+
 ## 1.5.3 (2024-03-27)
 
 * Bug fixes
