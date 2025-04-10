@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.0-dev
+
+* Enhancements
+  * Default the window that is reloaded to `:parent` instead of `:top` to avoid conflicts with dev tools
+  * Add support for `__RELATIVEFILE__` for invoking editors
+
+* Bug fixes
+  * Inject iframe if web console logger is enabled but there are no patterns
+  * Allow web console to shutdown cleanly
+
 ## 1.5.3 (2024-03-27)
 
 * Bug fixes
