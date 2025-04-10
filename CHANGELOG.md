@@ -3,7 +3,12 @@
 ## 1.6.0-dev
 
 * Enhancements
-  * Default the window that is reloaded to `:parent` instead of `:top` to avoid conflicts with dev tools
+  * Change the default target window to `:top` to not reload the whole page if a Phoenix app is shown inside an iframe. You can get the old behavior back by setting the `:target_window` option to `:top`:
+    ```elixir
+    config :phoenix_live_reload, MyAppWeb.Endpoint,
+      target_window: :top,
+      ...
+    ```
   * Add support for `__RELATIVEFILE__` for invoking editors
 
 * Bug fixes
