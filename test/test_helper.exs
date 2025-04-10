@@ -31,17 +31,10 @@ Application.put_env(:phoenix_live_reload, MyApp.EndpointConfig,
   ]
 )
 
-Application.put_env(:phoenix_live_reload, MyApp.EndpointParentWindow,
+Application.put_env(:phoenix_live_reload, MyApp.EndpointTopWindow,
   pubsub_server: MyApp.PubSub,
   live_reload: [
-    target_window: :parent
-  ]
-)
-
-Application.put_env(:phoenix_live_reload, MyApp.EndpointWrongWindow,
-  pubsub_server: MyApp.PubSub,
-  live_reload: [
-    target_window: "other"
+    target_window: :top
   ]
 )
 
@@ -86,11 +79,7 @@ defmodule MyApp.EndpointConfig do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 end
 
-defmodule MyApp.EndpointParentWindow do
-  use Phoenix.Endpoint, otp_app: :phoenix_live_reload
-end
-
-defmodule MyApp.EndpointWrongWindow do
+defmodule MyApp.EndpointTopWindow do
   use Phoenix.Endpoint, otp_app: :phoenix_live_reload
 end
 
@@ -105,8 +94,7 @@ children = [
   MyApp.Endpoint,
   MyApp.EndpointScript,
   MyApp.EndpointConfig,
-  MyApp.EndpointParentWindow,
-  MyApp.EndpointWrongWindow,
+  MyApp.EndpointTopWindow,
   MyApp.ReloadEndpoint,
   MyApp.LogEndpoint
 ]

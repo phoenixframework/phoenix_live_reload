@@ -44,8 +44,7 @@ defmodule Phoenix.LiveReloader do
       live reload. Expects a keyword list of atom keys and string values.
 
     * `:target_window` - the window that will be reloaded, as an atom.
-      Valid values are `:top` and `:parent`. An invalid value will
-      default to `:top`.
+      Valid values are `:top` and `:parent`. Defaults to `:parent`.
 
     * `:url` - the URL of the live reload socket connection. By default
       it will use the browser's host and port.
@@ -126,7 +125,7 @@ defmodule Phoenix.LiveReloader do
     config = endpoint.config(:live_reload)
     url = config[:url] || endpoint.path("/phoenix/live_reload/socket#{suffix(endpoint)}")
     interval = config[:interval] || 100
-    target_window = get_target_window(config[:target_window])
+    target_window = get_target_window(config[:target_window] || :parent)
     reload_page_on_css_changes? = config[:reload_page_on_css_changes] || false
 
     conn
