@@ -146,7 +146,9 @@ defmodule Phoenix.LiveReloader do
     config = endpoint.config(:live_reload)
 
     if match?([_ | _], config[:patterns]) || config[:web_console_logger] do
-      before_send_inject_reloader(conn, endpoint, config)
+      conn
+      |> put_private(:phoenix_live_reload, true)
+      |> before_send_inject_reloader(endpoint, config)
     else
       conn
     end
