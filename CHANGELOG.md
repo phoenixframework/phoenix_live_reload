@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1 (2025-08-31)
+
+* Enhancements
+  * Set `:phoenix_live_reload` private field to downstream instrumentation
+  * Add `@import` directive support to CSS reload strategy
+
 ## 1.6.0 (2025-04-10)
 
 * Enhancements
