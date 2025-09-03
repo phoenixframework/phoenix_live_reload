@@ -84,6 +84,17 @@ let pageStrategy = channel => {
   window[targetWindow].location.reload()
 }
 
+const elixirLogLevels = [
+  "emergency", 
+  "alert", 
+  "critical", 
+  "error", 
+  "warning", 
+  "notice" ,
+  "info", 
+  "debug"
+]
+
 let reloadStrategies = {
   css: reloadPageOnCssChanges ? pageStrategy : cssStrategy,
   page: pageStrategy
@@ -93,6 +104,7 @@ class LiveReloader {
   constructor(socket){
     this.socket = socket
     this.logsEnabled = false
+    this.minLogLevel = "debug"
     this.enabledOnce = false
     this.editorURL = null
   }
@@ -112,7 +124,7 @@ class LiveReloader {
       let reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.page
       setTimeout(() => reloadStrategy(this.channel), interval)
     })
-    this.channel.on("log", ({msg, level}) => this.logsEnabled && this.log(level, msg))
+    this.channel.on("log", ({msg, level}) => this.logsEnabled && this.isMinLogLevel(level) && this.log(level, msg))
     this.channel.join().receive("ok", ({editor_url}) => {
       this.editorURL = editor_url
     })
@@ -124,8 +136,15 @@ class LiveReloader {
     socket.disconnect()
   }
 
-  enableServerLogs(){ this.logsEnabled = true }
+  enableServerLogs(level = this.minLogLevel){ 
+    this.logsEnabled = true
+    this.minLogLevel = level
+  }
   disableServerLogs(){ this.logsEnabled = false }
+
+  isMinLogLevel(level){
+    return elixirLogLevels.indexOf(level) <= elixirLogLevels.indexOf(this.minLogLevel)
+  }
 
   openEditorAtCaller(targetNode){
     if(!this.editorURL){
