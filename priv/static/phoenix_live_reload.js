@@ -40,9 +40,14 @@ let jsStrategy = (chan, msg) => {
 // Patched functions end
 //
 
-let buildFreshUrl = (link) => {
+let getFreshUrl = (url) => {
   let date = Math.round(Date.now() / 1000).toString()
-  let url = link.href.replace(/(\&|\\?)vsn=\d*/, "")
+  let cleanUrl = url.replace(/(&|\?)vsn=\d*/, "")
+  let freshUrl = cleanUrl + (cleanUrl.indexOf("?") >= 0 ? "&" : "?") + "vsn=" + date
+  return freshUrl;
+}
+
+let buildFreshLinkUrl = (link) => {
   let newLink = document.createElement('link')
   let onComplete = () => {
     if(link.parentNode !== null){
@@ -53,16 +58,45 @@ let buildFreshUrl = (link) => {
   newLink.onerror = onComplete
   newLink.onload  = onComplete
   link.setAttribute("data-pending-removal", "")
-  newLink.setAttribute("rel", "stylesheet");
-  newLink.setAttribute("type", "text/css");
-  newLink.setAttribute("href", url + (url.indexOf("?") >= 0 ? "&" : "?") + "vsn=" + date)
+  newLink.setAttribute("rel", "stylesheet")
+  newLink.setAttribute("type", "text/css")
+  newLink.setAttribute("href", getFreshUrl(link.href))
   link.parentNode.insertBefore(newLink, link.nextSibling)
   return newLink
 }
 
+let buildFreshImportUrl = (style) => {
+  let newStyle = document.createElement('style')
+  let onComplete = () => {
+    if (style.parentNode !== null) {
+      style.parentNode.removeChild(style)
+    }
+  }
+
+  let originalCSS = style.textContent || style.innerHTML
+  let freshCSS = originalCSS.replace(/@import\s+(?:url\()?['"]?([^'"\)]+)['"]?\)?/g, (match, url) => {
+    const freshUrl = getFreshUrl(url);
+
+    if (match.includes('url(')) {
+      return `@import url("${freshUrl}")`
+    } else {
+      return `@import "${freshUrl}"`
+    }
+  })
+
+  newStyle.onerror = onComplete
+  newStyle.onload = onComplete
+  style.setAttribute("data-pending-removal", "")
+  newStyle.setAttribute("type", "text/css")
+  newStyle.textContent = freshCSS
+
+  style.parentNode.insertBefore(newStyle, style.nextSibling)
+  return newStyle
+}
+
 let repaint = () => {
   let browser = navigator.userAgent.toLowerCase()
-  if(browser.indexOf("chrome") > -1){
+  if (browser.indexOf("chrome") > -1) {
     setTimeout(() => document.body.offsetHeight, 25)
   }
 }
@@ -74,7 +108,15 @@ let cssStrategy = () => {
 
   Array.from(reloadableLinkElements)
     .filter(link => link.href)
-    .forEach(link => buildFreshUrl(link))
+    .forEach(link => buildFreshLinkUrl(link))
+
+  let reloadablestyles = window.parent.document.querySelectorAll(
+    "style:not([data-no-reload]):not([data-pending-removal])"
+  )
+
+  Array.from(reloadablestyles)
+    .filter(style => style.textContent.includes("@import"))
+    .forEach(style => buildFreshImportUrl(style))
 
   repaint()
 }
@@ -158,7 +200,7 @@ class LiveReloader {
       .receive("ok", ({full_path}) => {
         console.log("full path", full_path)
         let url = this.editorURL
-          .replace("__RELATIVEFILE__", file)  
+          .replace("__RELATIVEFILE__", file)
           .replace("__FILE__", full_path)
           .replace("__LINE__", line)
         window.open(url, "_self")
@@ -179,7 +221,7 @@ class LiveReloader {
   logMsg(fun, str, color) {
     fun(`%c📡 ${str}`, `color: ${color};`)
   }
-  
+
   logFunc(level){
     switch(level) {
       case "debug":
