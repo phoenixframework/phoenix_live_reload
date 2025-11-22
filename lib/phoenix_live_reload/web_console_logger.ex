@@ -53,7 +53,7 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
   def log(%{meta: meta, level: level} = event, config) do
     %{formatter: {formatter_mod, formatter_config}} = config
     iodata = formatter_mod.format(event, formatter_config)
-    msg = IO.iodata_to_binary(iodata)
+    msg = IO.chardata_to_string(iodata)
 
     Registry.dispatch(@registry, :all, fn entries ->
       event = %{level: level, msg: msg, file: meta[:file], line: meta[:line]}
