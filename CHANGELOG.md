@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.2 (2025-12-08)
+
+* Bug fixes
+  * Properly deal with Unicode when forwarding logs
+
 ## 1.6.1 (2025-08-31)
 
 * Enhancements
