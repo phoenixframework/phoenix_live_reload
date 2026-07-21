@@ -56,7 +56,7 @@ Many times it's useful to inspect the HTML DOM tree to find where markup is bein
 export PLUG_EDITOR="vscode://file/__FILE__:__LINE__"
 ```
 
-The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substituted at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked while a shortcut key is held, enable editor shortcuts within your `"phx:live_reload:attached"` callback. The default keys are `"c"` for the caller and `"d"` for the function component definition, and can be customized. For example:
+The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substituted at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked while a shortcut key is held, enable editor shortcuts within your `"phx:live_reload:attached"` callback and configure the keys for the caller and function component definition. For example:
 
 ```javascript
 window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
@@ -70,7 +70,7 @@ window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
 })
 ```
 
-You can also call `enableEditorShortcuts()` without options to use the default keys. Calling it again replaces the existing shortcuts. The lower-level `openEditorAtCaller` and `openEditorAtDef` functions remain available when you need to provide your own event handling, for example:
+Both the `caller` and `definition` keys are required. Calling `enableEditorShortcuts` again replaces the existing shortcuts. The lower-level `openEditorAtCaller` and `openEditorAtDef` functions remain available when you need to provide your own event handling, for example:
 
 ```javascript
 // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
