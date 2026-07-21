@@ -56,33 +56,41 @@ Many times it's useful to inspect the HTML DOM tree to find where markup is bein
 export PLUG_EDITOR="vscode://file/__FILE__:__LINE__"
 ```
 
-The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substituted at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:attached"` callback and make use of the reloader's `openEditorAtCaller` and `openEditorAtDef` functions, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
+The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substituted at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked while a shortcut key is held, enable editor shortcuts within your `"phx:live_reload:attached"` callback. The default keys are `"c"` for the caller and `"d"` for the function component definition, and can be customized. For example:
 
 ```javascript
 window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
   // Enable server log streaming to client. Disable with reloader.disableServerLogs()
   reloader.enableServerLogs()
 
-  // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
-  //
-  //   * click with "c" key pressed to open at caller location
-  //   * click with "d" key pressed to open at function component definition location
-  let keyDown
-  window.addEventListener("keydown", e => keyDown = e.key)
-  window.addEventListener("keyup", e => keyDown = null)
-  window.addEventListener("click", e => {
-    if(keyDown === "c"){
-      e.preventDefault()
-      e.stopImmediatePropagation()
-      reloader.openEditorAtCaller(e.target)
-    } else if(keyDown === "d"){
-      e.preventDefault()
-      e.stopImmediatePropagation()
-      reloader.openEditorAtDef(e.target)
-    }
-  }, true)
+  // Open configured PLUG_EDITOR at the clicked element's HEEx caller or
+  // function component definition. Disable with reloader.disableEditorShortcuts()
+  reloader.enableEditorShortcuts({caller: "c", definition: "d"})
   window.liveReloader = reloader
 })
+```
+
+You can also call `enableEditorShortcuts()` without options to use the default keys. Calling it again replaces the existing shortcuts. The lower-level `openEditorAtCaller` and `openEditorAtDef` functions remain available when you need to provide your own event handling, for example:
+
+```javascript
+// Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
+//
+//   * click with "c" key pressed to open at caller location
+//   * click with "d" key pressed to open at function component definition location
+let keyDown
+window.addEventListener("keydown", e => keyDown = e.key)
+window.addEventListener("keyup", e => keyDown = null)
+window.addEventListener("click", e => {
+  if(keyDown === "c"){
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    reloader.openEditorAtCaller(e.target)
+  } else if(keyDown === "d"){
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    reloader.openEditorAtDef(e.target)
+  }
+}, true)
 ```
 
 ## Backends
