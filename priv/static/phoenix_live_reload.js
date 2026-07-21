@@ -190,7 +190,11 @@ class LiveReloader {
     return elixirLogLevels.indexOf(level) <= elixirLogLevels.indexOf(this.minLogLevel)
   }
 
-  enableEditorShortcuts({caller = "c", definition = "d"} = {}){
+  enableEditorShortcuts({caller, definition} = {}){
+    if(!caller || !definition){
+      throw new Error("phoenix_live_reload enableEditorShortcuts requires caller and definition keys")
+    }
+
     this.disableEditorShortcuts()
 
     let keysDown = new Set()
