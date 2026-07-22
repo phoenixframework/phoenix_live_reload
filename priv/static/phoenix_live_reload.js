@@ -125,7 +125,7 @@ class LiveReloader {
       let reloadStrategy = reloadStrategies[msg.asset_type] || reloadStrategies.page
       setTimeout(() => reloadStrategy(this.channel), interval)
     })
-    this.channel.on("log", ({msg, level, file, line, pid}) => this.logsEnabled && this.log(level, msg, { file, line, pid }))
+    this.channel.on("log", ({msg, level, file, line, pid, metadata}) => this.logsEnabled && this.log(level, msg, { ...metadata, file, line, pid }))
     this.channel.join().receive("ok", ({editor_url}) => {
       this.editorURL = editor_url
     })

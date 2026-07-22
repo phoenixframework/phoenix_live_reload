@@ -54,6 +54,7 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
     %{formatter: {formatter_mod, formatter_config}} = config
     iodata = formatter_mod.format(event, formatter_config)
     msg = IO.chardata_to_string(iodata)
+    metadata_keys = Application.get_env(:phoenix_live_reload, :web_console_logger_forward_metadata, [])
 
     Registry.dispatch(@registry, :all, fn entries ->
       event = %{
@@ -61,7 +62,8 @@ defmodule Phoenix.LiveReloader.WebConsoleLogger do
         msg: msg,
         file: to_string(meta[:file]),
         line: meta[:line],
-        pid: inspect(meta[:pid])
+        pid: inspect(meta[:pid]),
+        metadata: Map.take(meta, metadata_keys)
       }
 
       for {pid, prefix} <- entries do
