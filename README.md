@@ -27,7 +27,7 @@ The default interval is 100ms.
 
 > *Note:* This feature is only available for Elixir v1.15+
 
-Streaming server logs that you see in the terminal when running `mix phx.server` can be useful to have on the client during development, especially when debugging with SPA fetch callbacks, GraphQL queries, or LiveView actions in the browsers web console. You can enable log streaming to collocate client and server logs in the web console with the `web_console_logger` configuration in your `config/dev.exs`:
+Streaming server logs that you see in the terminal when running `mix phx.server` can be useful to have on the client during development, especially when debugging with SPA fetch callbacks, GraphQL queries, or LiveView actions in the browsers web console. You can enable log streaming to colocate client and server logs in the web console with the `web_console_logger` configuration in your `config/dev.exs`:
 
 ```elixir
 config :my_app, MyAppWeb.Endpoint,
@@ -48,6 +48,28 @@ window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
 })
 ```
 
+Each log line is also emitted as a `"phx:live_reload:log"` event on the window, which can be used by third party
+devtools.
+
+```javascript
+window.addEventListener("phx:live_reload:log", ({detail: { level, message, metadata }}) => {
+  // level is one of "debug", "info", "notice", "warning", "error", "critical", "alert", "emergency"
+  // message is the log message string
+  // metadata is a map of log metadata, including by default: pid, line, file
+})
+```
+
+You can configure additional metadata to be included in the log event by setting the `:web_console_logger_forward_metadata` option in your `config/dev.exs`:
+
+```elixir
+config :my_app, MyAppWeb.Endpoint,
+  live_reload: [
+    web_console_logger_forward_metadata: [:time]
+  ]
+```
+
+Values have to be JSON-serializable.
+
 ## Jumping to HEEx function definitions
 
 Many times it's useful to inspect the HTML DOM tree to find where markup is being rendered from within your application. HEEx supports annotating rendered HTML with HTML comments that give you the file/line of a HEEx function component and caller. `:phoenix_live_reload` will look for the `PLUG_EDITOR` environment export (used by the plug debugger page to link to source code) to launch a configured URL of your choice to open your code editor to the file-line of the HTML annotation. For example, the following export on your system would open vscode at the correct file/line:
@@ -56,33 +78,41 @@ Many times it's useful to inspect the HTML DOM tree to find where markup is bein
 export PLUG_EDITOR="vscode://file/__FILE__:__LINE__"
 ```
 
-The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substituted at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked, say with alt-click, you can wire up an event listener within your `"phx:live_reload:attached"` callback and make use of the reloader's `openEditorAtCaller` and `openEditorAtDef` functions, passing the event target as the DOM node to reference for HEEx file:line annotation information. For example:
+The `vscode://` protocol URL will open vscode with placeholders of `__FILE__:__LINE__` substituted at runtime. Check your editor's documentation on protocol URL support. To open your configured editor URL when an element is clicked while a shortcut key is held, enable editor shortcuts within your `"phx:live_reload:attached"` callback and configure the keys for the caller and function component definition. For example:
 
 ```javascript
 window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
   // Enable server log streaming to client. Disable with reloader.disableServerLogs()
   reloader.enableServerLogs()
 
-  // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
-  //
-  //   * click with "c" key pressed to open at caller location
-  //   * click with "d" key pressed to open at function component definition location
-  let keyDown
-  window.addEventListener("keydown", e => keyDown = e.key)
-  window.addEventListener("keyup", e => keyDown = null)
-  window.addEventListener("click", e => {
-    if(keyDown === "c"){
-      e.preventDefault()
-      e.stopImmediatePropagation()
-      reloader.openEditorAtCaller(e.target)
-    } else if(keyDown === "d"){
-      e.preventDefault()
-      e.stopImmediatePropagation()
-      reloader.openEditorAtDef(e.target)
-    }
-  }, true)
+  // Open configured PLUG_EDITOR at the clicked element's HEEx caller or
+  // function component definition. Disable with reloader.disableEditorShortcuts()
+  reloader.enableEditorShortcuts({caller: "c", definition: "d"})
   window.liveReloader = reloader
 })
+```
+
+Both the `caller` and `definition` keys are required. Calling `enableEditorShortcuts` again replaces the existing shortcuts. The lower-level `openEditorAtCaller` and `openEditorAtDef` functions remain available when you need to provide your own event handling, for example:
+
+```javascript
+// Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
+//
+//   * click with "c" key pressed to open at caller location
+//   * click with "d" key pressed to open at function component definition location
+let keyDown
+window.addEventListener("keydown", e => keyDown = e.key)
+window.addEventListener("keyup", e => keyDown = null)
+window.addEventListener("click", e => {
+  if(keyDown === "c"){
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    reloader.openEditorAtCaller(e.target)
+  } else if(keyDown === "d"){
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    reloader.openEditorAtDef(e.target)
+  }
+}, true)
 ```
 
 ## Backends
