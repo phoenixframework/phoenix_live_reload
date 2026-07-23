@@ -64,7 +64,7 @@ You can configure additional metadata to be included in the log event by setting
 ```elixir
 config :my_app, MyAppWeb.Endpoint,
   live_reload: [
-    :web_console_logger_forward_metadata: [:time]
+    web_console_logger_forward_metadata: [:time]
   ]
 ```
 
