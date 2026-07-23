@@ -27,7 +27,7 @@ The default interval is 100ms.
 
 > *Note:* This feature is only available for Elixir v1.15+
 
-Streaming server logs that you see in the terminal when running `mix phx.server` can be useful to have on the client during development, especially when debugging with SPA fetch callbacks, GraphQL queries, or LiveView actions in the browsers web console. You can enable log streaming to collocate client and server logs in the web console with the `web_console_logger` configuration in your `config/dev.exs`:
+Streaming server logs that you see in the terminal when running `mix phx.server` can be useful to have on the client during development, especially when debugging with SPA fetch callbacks, GraphQL queries, or LiveView actions in the browsers web console. You can enable log streaming to colocate client and server logs in the web console with the `web_console_logger` configuration in your `config/dev.exs`:
 
 ```elixir
 config :my_app, MyAppWeb.Endpoint,
@@ -47,6 +47,28 @@ window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
   reloader.enableServerLogs()
 })
 ```
+
+Each log line is also emitted as a `"phx:live_reload:log"` event on the window, which can be used by third party
+devtools.
+
+```javascript
+window.addEventListener("phx:live_reload:log", ({detail: { level, message, metadata }}) => {
+  // level is one of "debug", "info", "notice", "warning", "error", "critical", "alert", "emergency"
+  // message is the log message string
+  // metadata is a map of log metadata, including by default: pid, line, file
+})
+```
+
+You can configure additional metadata to be included in the log event by setting the `:web_console_logger_forward_metadata` option in your `config/dev.exs`:
+
+```elixir
+config :my_app, MyAppWeb.Endpoint,
+  live_reload: [
+    :web_console_logger_forward_metadata: [:time]
+  ]
+```
+
+Values have to be JSON-serializable.
 
 ## Jumping to HEEx function definitions
 
