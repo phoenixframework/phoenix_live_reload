@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0 (2026-07-29)
+
+* Enhancements
+  * Add JavaScript helper function to capture keyboard shortcuts to open HEEx components
+  * Forward log events to window for custom behaviour
+
 ## 1.6.2 (2025-12-08)
 
 * Bug fixes
